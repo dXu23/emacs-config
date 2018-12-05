@@ -1,0 +1,106 @@
+
+;; org-mode
+(setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
+
+(let* ((org-dir (expand-file-name
+		 "lisp" (expand-file-name
+			 "org" (expand-file-name
+				"src" dotfiles-dir))))
+        (org-contrib-dir (expand-file-name
+              		 "lisp" (expand-file-name
+	        		 "contrib" (expand-file-name
+		         		    ".." org-dir))))
+	(load-path (append (list org-dir org-contrib-dir)
+			   (or load-path nil))))
+
+  ;; load up Org-mode and Org-babel
+  (require 'org-install)
+  (require 'ob-tangle))
+
+(mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
+
+(require 'org)
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-switchb)
+
+(setq org-log-done t)
+
+(setq org-agenda-files '("~/gtd/inbox.org"
+                         "~/gtd/gtd.org"
+                         "~/gtd/tickler.org"))
+
+(setq org-capture-templates '(("t" "Todo [inbox]" entry
+                               (file+headline "~/gtd/inbox.org" "Tasks")
+                               "* TODO %i%?")
+                              ("T" "Tickler" entry
+                               (file+headline "~/gtd/tickler.org" "Tickler")
+                               "* %i%? \n %U")))
+
+(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
+;; (setq org-refile-targets '(("~/openDrive/gtd/gtd.org" :maxlevel . 3)
+;;                            ("~/openDrive/gtd/someday.org" :level . 1)
+;;                            ("~/openDrive/gtd/tickler.org" :maxlevel . 2)))
+
+(setq make-backup-file nil)
+(setq auto-save-default nil)
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; (defvar my-term-shell "/bin/bash")
+;;  (defadvice ansi-term (before force-bash)
+;;    (interactive (list my-term-shell)))
+;; (ad-activate 'ansi-term)
+
+;; (global-set-key (kbd "<s-return>") 'ansi-term)
+
+
+(setq scroll-conservatively 100)
+
+(setq ring-bell-functioni 'ignore)
+
+
+
+
+
+
+(unless (package-installed-p 'moe-theme)
+  (package-refresh-contents)
+  (package-install 'moe-theme))
+
+(require 'moe-theme)
+(moe-light)
+
+;; (setq my-fonts '("-xos4-terminus-medium-*-*-*-24-*-*-*-*-*-iso10646-1"))
+;; (create-fontset-from-fontset-spec standard-fontset-spec) ;to make --daemon work
+;; (dolist (font (reverse my-fonts))
+;;   (set-fontset-font "fontset-standard" 'unicode font nil 'prepend))
+;; (add-to-list 'default-frame-alist '(font . "fontset-standard"))
+(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-level-1 ((t (:foreground "#5fafd7" :weight bold :family "\"terminus\"")))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(jdee-jdk-registry
+   (quote
+    (("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
+     ("1.8.0_192" . "/usr/lib64/jvm/java-11-openjdk"))))
+ '(jdee-server-dir "~/jdee-server/target/")
+ '(org-agenda-files nil)
+ '(package-selected-packages
+   (quote
+    (emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
+
+(put 'upcase-region 'disabled nil)
