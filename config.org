@@ -1,3 +1,4 @@
+Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 * 'Fixing' Emacs
 ** Set emacs so that scratch buffer shows up instead of help screen
 #+BEGIN_SRC emacs-lisp
