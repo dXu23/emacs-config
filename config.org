@@ -8,6 +8,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (setq x-select-enable-clipboard-manager nil)
 #+END_SRC
+** Prevent emacs from making backup files
+#+BEGIN_SRC emacs-lisp
+(setq make-backup-file nil)
+#+END_SRC
+** Prevent emacs from auto-saving
+#+BEGIN_SRC emacs-lisp
+(setq auto-save-default nil)
+#+END_SRC
+** Make yes or no prompts as simple as typing 'y' or 'n'
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -123,10 +135,27 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (when window-system (global-prettify-symbols-mode t))
 #+END_SRC
+** Set font to terminus
+#+BEGIN_SRC emacs-lisp
+(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+#+END_SRC
+** Make emacs theme moe
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'moe-theme)
+  (package-refresh-contents)
+  (package-install 'moe-theme))
+
+(require 'moe-theme)
+(moe-light)
+#+END_SRC
 * Language-Specific Settings
 ** C
 #+BEGIN_SRC elisp
   (setq-default c-basic-offset 4)
+#+END_SRC
+** Clojure
+#+BEGIN_SRC elisp
+  (use-package cider)
 #+END_SRC
 * Org
 ** Org Bullets

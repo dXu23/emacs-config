@@ -2,6 +2,12 @@
 
 (setq x-select-enable-clipboard-manager nil)
 
+(setq make-backup-file nil)
+
+(setq auto-save-default nil)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
 (defun config-visit ()
   (interactive)
   (find-file "~/.emacs.d/config.org"))
@@ -72,6 +78,15 @@
 (when window-system (global-hl-line-mode t))
 
 (when window-system (global-prettify-symbols-mode t))
+
+(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+
+(unless (package-installed-p 'moe-theme)
+  (package-refresh-contents)
+  (package-install 'moe-theme))
+
+(require 'moe-theme)
+(moe-light)
 
 (use-package org-bullets
   :ensure t

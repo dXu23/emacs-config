@@ -41,15 +41,12 @@
 (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+      '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
 ;; (setq org-refile-targets '(("~/openDrive/gtd/gtd.org" :maxlevel . 3)
 ;;                            ("~/openDrive/gtd/someday.org" :level . 1)
 ;;                            ("~/openDrive/gtd/tickler.org" :maxlevel . 2)))
 
-(setq make-backup-file nil)
-(setq auto-save-default nil)
-(defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; (defvar my-term-shell "/bin/bash")
 ;;  (defadvice ansi-term (before force-bash)
@@ -65,22 +62,12 @@
 
 
 
-
-
-
-(unless (package-installed-p 'moe-theme)
-  (package-refresh-contents)
-  (package-install 'moe-theme))
-
-(require 'moe-theme)
-(moe-light)
-
 ;; (setq my-fonts '("-xos4-terminus-medium-*-*-*-24-*-*-*-*-*-iso10646-1"))
 ;; (create-fontset-from-fontset-spec standard-fontset-spec) ;to make --daemon work
 ;; (dolist (font (reverse my-fonts))
 ;;   (set-fontset-font "fontset-standard" 'unicode font nil 'prepend))
 ;; (add-to-list 'default-frame-alist '(font . "fontset-standard"))
-(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
