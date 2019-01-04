@@ -135,9 +135,9 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (when window-system (global-prettify-symbols-mode t))
 #+END_SRC
-** Set font to terminus
+** Set font to M+ 1mn
 #+BEGIN_SRC emacs-lisp
-(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+  (set-frame-font "M+ 1mn")
 #+END_SRC
 ** Make emacs theme moe
 #+BEGIN_SRC emacs-lisp
