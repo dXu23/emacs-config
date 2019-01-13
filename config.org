@@ -20,6 +20,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+** Use newlines  as a separator when appending and prepending to registers
+#+BEGIN_SRC emacs-lisp
+  (setq register-separator ?+)
+  (set-register register-separator "\n\n")
+#+END_SRC
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -105,6 +110,12 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind
     ([remap other-window] . switch-window))
 
+#+END_SRC
+** popup-kill-ring
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces

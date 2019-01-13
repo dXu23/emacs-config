@@ -91,3 +91,4 @@
     (emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)
+(put 'set-goal-column 'disabled nil)
