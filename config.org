@@ -24,6 +24,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'exec-path "/usr/local/bin")
 
+** Use newlines  as a separator when appending and prepending to registers
+#+BEGIN_SRC emacs-lisp
+  (setq register-separator ?+)
+  (set-register register-separator "\n\n")
 #+END_SRC
 * config edit/reload
 ** edit
@@ -137,6 +141,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (use-package 4clojure
     :ensure t)
+#+END_SRC
+
+** popup-kill-ring
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces
