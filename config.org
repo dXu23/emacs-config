@@ -213,7 +213,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Save clock history across emacs sessions
 #+BEGIN_SRC emacs-lisp
   (setq org-clock-persist 'history)
-  (org-clock-persitence-insinuate)
+  (org-clock-persistence-insinuate)
 #+END_SRC
 ** Org Bullets
 #+BEGIN_SRC emacs-lisp

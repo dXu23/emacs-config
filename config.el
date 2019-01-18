@@ -69,6 +69,25 @@
   :bind
   ([remap other-window] . switch-window))
 
+(use-package cider
+  :ensure t)
+
+(use-package spaceline
+  :ensure t
+  :config
+  (require 'spaceline-config)
+  (setq powerline-default-separator (quote arrow)))
+
+(use-package helm
+  :ensure t)
+
+(use-package 4clojure
+  :ensure t)
+
+(use-package popup-kill-ring
+  :ensure t
+  :bind ("M-y" . popup-kill-ring))
+
 (tool-bar-mode -1)
 
 (menu-bar-mode -1)
@@ -79,7 +98,7 @@
 
 (when window-system (global-prettify-symbols-mode t))
 
-(set-default-font "-*-terminus-*-*-*-*-18-*-*-*-*-*-*-*")
+(set-frame-font "M+ 1mn")
 
 (unless (package-installed-p 'moe-theme)
   (package-refresh-contents)
@@ -87,6 +106,13 @@
 
 (require 'moe-theme)
 (moe-light)
+
+(setq org-goto-auto-isearch nil)
+
+(setq org-list-indent-offset 2)
+
+(setq org-clock-persist 'history)
+(org-clock-persitence-insinuate)
 
 (use-package org-bullets
   :ensure t
