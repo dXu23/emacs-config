@@ -43,6 +43,7 @@
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
+
 ;; (setq org-refile-targets '(("~/openDrive/gtd/gtd.org" :maxlevel . 3)
 ;;                            ("~/openDrive/gtd/someday.org" :level . 1)
 ;;                            ("~/openDrive/gtd/tickler.org" :maxlevel . 2)))
@@ -88,6 +89,6 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
+    (4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)

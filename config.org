@@ -20,6 +20,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+** Adding '/usr/local/bin' to exec-paty
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'exec-path "/usr/local/bin")
+
+#+END_SRC
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -84,7 +89,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind
     ("M-s" . avy-goto-char))
 #+END_SRC
-** rainbow 
+** rainQbow 
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
     :ensure t
@@ -92,6 +97,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 #+END_SRC
 ** switch-window
+    Package to switch windows more quickly; Pressing C-x o now brings up a menu of keys
+    corresponding to the window one wants to switch to
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :ensure t
@@ -105,6 +112,31 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind
     ([remap other-window] . switch-window))
 
+#+END_SRC
+** Cider
+    Package for clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :ensure t)
+#+END_SRC
+** Modeline
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow)))
+
+#+END_SRC
+** Helm
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t)
+#+END_SRC
+** 4clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package 4clojure
+    :ensure t)
 #+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces
@@ -158,6 +190,20 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package cider)
 #+END_SRC
 * Org
+** Turn off org-goto-auto-isearch
+#+BEGIN_SRC emacs-lisp
+  (setq org-goto-auto-isearch nil)
+
+#+END_SRC
+** Set org-indent to 2
+#+BEGIN_SRC emacs-lisp
+  (setq org-list-indent-offset 2)
+#+END_SRC
+** Save clock history across emacs sessions
+#+BEGIN_SRC emacs-lisp
+  (setq org-clock-persist 'history)
+  (org-clock-persitence-insinuate)
+#+END_SRC
 ** Org Bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
