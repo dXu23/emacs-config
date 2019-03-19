@@ -112,7 +112,7 @@
 (setq org-list-indent-offset 2)
 
 (setq org-clock-persist 'history)
-(org-clock-persitence-insinuate)
+(org-clock-persistence-insinuate)
 
 (use-package org-bullets
   :ensure t
