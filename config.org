@@ -20,14 +20,19 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-** Adding '/usr/local/bin' to exec-paty
+** Adding '/usr/local/bin' to exec-path
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'exec-path "/usr/local/bin")
-
+#+END_SRC
 ** Use newlines  as a separator when appending and prepending to registers
 #+BEGIN_SRC emacs-lisp
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
+#+END_SRC
+** Some preferred keybindings
+     Set 'M-S-z' to zap-up-to-char
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\M-Z" 'zap-up-to-char)
 #+END_SRC
 * config edit/reload
 ** edit
