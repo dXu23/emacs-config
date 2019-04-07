@@ -98,7 +98,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind
     ("M-s" . avy-goto-char))
 #+END_SRC
-** rainQbow 
+** rainbow 
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
     :ensure t
@@ -154,6 +154,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :ensure t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
+** htmlize
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+#+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces
 #+BEGIN_SRC elisp
@@ -206,6 +210,61 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package cider)
 #+END_SRC
 * Org
+** Org-mode keybindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-switchb)
+#+END_SRC
+
+** Set org-log-done to true
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done t)
+#+END_SRC
+
+** Set org-mode agenda files
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files (list "~/gtd/inbox.org"
+			       "~/gtd/gtd.org"
+			       "~/gtd/tickler.org"))
+
+#+END_SRC
+
+** Set priority range from A to C with default A
+#+BEGIN_SRC emacs-lisp
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?A)
+#+END_SRC
+
+** Set colors for priorities
+#+BEGIN_SRC emacs-lisp
+  (setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
+			     (?B . (:foreground "LightSteelBlue"))
+			     (?C . (:foreground "OliveDrab"))))
+#+END_SRC
+
+** Org-mode templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates '(("t" "Todo [inbox]" entry
+				 (file+headline "~/gtd/inbox.org" "Tasks")
+				 "* TODO [#A] %i%?")
+				("T" "Tickler" entry
+				 (file+headline "~/gtd/tickler.org" "Tickler")
+				 "* %i%? \n %U")))
+#+END_SRC
+
+** org-refile targets
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+#+END_SRC
+** org-mode todo keywords
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+#+END_SRC
+
 ** Turn off org-goto-auto-isearch
 #+BEGIN_SRC emacs-lisp
   (setq org-goto-auto-isearch nil)
@@ -220,6 +279,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
 #+END_SRC
+
+** Syntax highlight text in block
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
 ** Org Bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -227,6 +291,30 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
+** Maximum indentation for description lists
+#+BEGIN_SRC emacs-lisp
+  (setq org-list-description-max-indent 5)
+#+END_SRC
+** prevent demoting heading
+#+BEGIN_SRC emacs-lisp
+  (setq org-adapt-indentation nil)
+
+#+END_SRC
+
+** Have org-mode support programming languages
+   #+BEGIN_SRC emacs-lisp
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '(
+	(shell . t)
+	(C . t)
+	(python . t)
+	(R . t)
+	(ditaa . t)
+	(gnuplot . t)
+	))
+   #+END_SRC
+
 * Terminal
 ** Setting default shell to bash
 #+BEGIN_SRC emacs-lisp

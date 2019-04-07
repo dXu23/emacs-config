@@ -8,6 +8,13 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(add-to-list 'exec-path "/usr/local/bin")
+
+(setq register-separator ?+)
+(set-register register-separator "\n\n")
+
+(global-set-key "\M-Z" 'zap-up-to-char)
+
 (defun config-visit ()
   (interactive)
   (find-file "~/.emacs.d/config.org"))
@@ -88,6 +95,8 @@
   :ensure t
   :bind ("M-y" . popup-kill-ring))
 
+(use-package htmlize)
+
 (tool-bar-mode -1)
 
 (menu-bar-mode -1)
@@ -107,6 +116,37 @@
 (require 'moe-theme)
 (moe-light)
 
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-switchb)
+
+(setq org-log-done t)
+
+(setq org-agenda-files (list "~/gtd/inbox.org"
+			     "~/gtd/gtd.org"
+			     "~/gtd/tickler.org"))
+
+(setq org-highest-priority ?A)
+(setq org-lowest-priority ?C)
+(setq org-default-priority ?A)
+
+(setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
+			   (?B . (:foreground "LightSteelBlue"))
+			   (?C . (:foreground "OliveDrab"))))
+
+(setq org-capture-templates '(("t" "Todo [inbox]" entry
+			       (file+headline "~/gtd/inbox.org" "Tasks")
+			       "* TODO [#A] %i%?")
+			      ("T" "Tickler" entry
+			       (file+headline "~/gtd/tickler.org" "Tickler")
+			       "* %i%? \n %U")))
+
+(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
 (setq org-goto-auto-isearch nil)
 
 (setq org-list-indent-offset 2)
@@ -114,10 +154,27 @@
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 
+(setq org-src-fontify-natively t)
+
 (use-package org-bullets
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+
+(setq org-list-description-max-indent 5)
+
+(setq org-adapt-indentation nil)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (shell . t)
+   (C . t)
+   (python . t)
+   (R . t)
+   (ditaa . t)
+   (gnuplot . t)
+   ))
 
 (defvar my-term-shell "/bin/bash")
 (defadvice ansi-term (before force-bash)
