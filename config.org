@@ -240,19 +240,59 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 ** Set colors for priorities
 #+BEGIN_SRC emacs-lisp
-  (setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
-			     (?B . (:foreground "LightSteelBlue"))
-			     (?C . (:foreground "OliveDrab"))))
+  (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
+			     (?B . (:foreground "#FFA500"))
+			     (?C . (:foreground "#48D1CC"))))
 #+END_SRC
 
 ** Org-mode templates
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates '(("t" "Todo [inbox]" entry
 				 (file+headline "~/gtd/inbox.org" "Tasks")
-				 "* TODO [#A] %i%?")
+				 "* TODO [#A] %i%?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
 				("T" "Tickler" entry
 				 (file+headline "~/gtd/tickler.org" "Tickler")
 				 "* %i%? \n %U")))
+#+END_SRC
+** open agenda in current window
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-window-setup (quote current-window))
+#+END_SRC
+
+** Warn about any deadline in next 7 days
+#+BEGIN_SRC emacs-lisp
+  (setq org-deadline-warning-days 7)
+#+END_SRC
+
+** Show tasks scheduled/due in next fortnight
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-span (quote fortnight))
+#+END_SRC
+
+** Do not show tasks as scheduled if already shown as deadline
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+#+END_SRC
+
+** Do not give warning colors to tasks w/ impending deadlines
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
+#+END_SRC
+
+** Do not show tasks that are scheduled or have deadlines in normal todo list
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-todo-ignore-deadlines (quote all))
+  (setq org-agenda-todo-ignore-scheduled (quote all))
+#+END_SRC
+
+** How tasks should be sorted
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-sorting-strategy
+	(quote
+	 ((agenda deadline-up priority-down)
+	  (todo priority-down category-keep)
+	  (tags priority-down category-keep)
+	  (search category-keep))))
 #+END_SRC
 
 ** org-refile targets

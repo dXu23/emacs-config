@@ -30,7 +30,7 @@
 
 (setq scroll-conservatively 100)
 
-(setq ring-bell-functioni 'ignore)
+(setq ring-bell-function 'ignore)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

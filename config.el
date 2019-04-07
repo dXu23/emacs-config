@@ -131,9 +131,9 @@
 (setq org-lowest-priority ?C)
 (setq org-default-priority ?A)
 
-(setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
-			   (?B . (:foreground "LightSteelBlue"))
-			   (?C . (:foreground "OliveDrab"))))
+(setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
+			   (?B . (:foreground "#FFA500"))
+			   (?C . (:foreground "#48D1CC"))))
 
 (setq org-capture-templates '(("t" "Todo [inbox]" entry
 			       (file+headline "~/gtd/inbox.org" "Tasks")
