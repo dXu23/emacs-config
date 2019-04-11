@@ -190,6 +190,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package helm
     :ensure t)
 #+END_SRC
+** Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind
+    ("C-x g" . magit-status))
+#+END_SRC
 ** Yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet

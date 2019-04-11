@@ -125,6 +125,11 @@
 (use-package helm
   :ensure t)
 
+(use-package magit
+  :ensure t
+  :bind
+  ("C-x g" . magit-status))
+
 (use-package yasnippet
   :ensure t
   :config
