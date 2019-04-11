@@ -37,6 +37,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
  '(jdee-jdk-registry
    (quote
     (("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
@@ -44,7 +45,7 @@
  '(jdee-server-dir "~/jdee-server/target/")
  '(package-selected-packages
    (quote
-    (magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
+    (yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)

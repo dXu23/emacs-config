@@ -17,12 +17,32 @@
 
 (global-set-key "\M-Z" 'zap-up-to-char)
 
+(defun split-and-follow-horizontally ()
+  "Splits a window horizontally and follows to opened window"
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1)
+  )
+
+(global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+
+(defun split-and-follow-vertically ()
+  "Splits a window vertically and follows to opened window"
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1)
+  )
+
+(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+
 (defun compile-based-on-extension (&optional args) 
     "Compile/run a file based on its extension"
     (interactive "P")
     (setq file-extension (file-name-extension buffer-file-name))
     (setq executable-name (file-name-base buffer-file-name))
-    (message executable-name)
     (cond ((string= file-extension "c")
 	  (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
 	  ((string= file-extension "cpp")
@@ -104,6 +124,14 @@
 
 (use-package helm
   :ensure t)
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (use-package yasnippet-snippets
+    :ensure t)
+  (yas-reload-all)
+  (yas-global-mode 1))
 
 (use-package 4clojure
   :ensure t)

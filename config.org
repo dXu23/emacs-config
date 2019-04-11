@@ -1,3 +1,4 @@
+
 Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 * 'Fixing' Emacs
 ** Set emacs so that scratch buffer shows up instead of help screen
@@ -38,6 +39,29 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\M-Z" 'zap-up-to-char)
 #+END_SRC
+*** Split and follow function
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+    "Splits a window horizontally and follows to opened window"
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1)
+    )
+
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+
+  (defun split-and-follow-vertically ()
+    "Splits a window vertically and follows to opened window"
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1)
+    )
+
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
 *** Making compiling easier
 #+BEGIN_SRC emacs-lisp
   (defun compile-based-on-extension (&optional args) 
@@ -45,7 +69,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
       (interactive "P")
       (setq file-extension (file-name-extension buffer-file-name))
       (setq executable-name (file-name-base buffer-file-name))
-      (message executable-name)
       (cond ((string= file-extension "c")
 	    (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
 	    ((string= file-extension "cpp")
@@ -73,6 +96,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
+
 * Extra Packages
 ** package-list
 #+BEGIN_SRC emacs-lisp
@@ -166,6 +190,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package helm
     :ensure t)
 #+END_SRC
+** Yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (use-package yasnippet-snippets
+      :ensure t)
+    (yas-reload-all)
+    (yas-global-mode 1))
+
+#+END_SRC
+
 ** 4clojure
 #+BEGIN_SRC emacs-lisp
   (use-package 4clojure
