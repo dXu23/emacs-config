@@ -24,16 +24,40 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'exec-path "/usr/local/bin")
 #+END_SRC
+** Set default tramp method to ssh
+#+BEGIN_SRC emacs-lisp
+  (setq tramp-default-method "ssh")
+#+END_SRC
 ** Use newlines  as a separator when appending and prepending to registers
 #+BEGIN_SRC emacs-lisp
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
 #+END_SRC
 ** Some preferred keybindings
-     Set 'M-S-z' to zap-up-to-char
+*** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\M-Z" 'zap-up-to-char)
 #+END_SRC
+*** Making compiling easier
+#+BEGIN_SRC emacs-lisp
+  (defun compile-based-on-extension (&optional args) 
+      "Compile/run a file based on its extension"
+      (interactive "P")
+      (setq file-extension (file-name-extension buffer-file-name))
+      (setq executable-name (file-name-base buffer-file-name))
+      (message executable-name)
+      (cond ((string= file-extension "c")
+	    (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
+	    ((string= file-extension "cpp")
+	     (compile (concat "g++ -o " executable-name " " buffer-file-name " && ./" executable-name)))
+	    ((string= file-extension "java")
+	    (compile (concat "javac " buffer-file-name " && java " executable-name)))
+      )
+  )
+
+
+#+END_SRC
+
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -218,6 +242,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 (global-set-key "\C-cb" 'org-switchb)
 #+END_SRC
 
+** Require org-drill
 ** Set org-log-done to true
 #+BEGIN_SRC emacs-lisp
 (setq org-log-done t)

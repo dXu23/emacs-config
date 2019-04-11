@@ -10,10 +10,27 @@
 
 (add-to-list 'exec-path "/usr/local/bin")
 
+(setq tramp-default-method "ssh")
+
 (setq register-separator ?+)
 (set-register register-separator "\n\n")
 
 (global-set-key "\M-Z" 'zap-up-to-char)
+
+(defun compile-based-on-extension (&optional args) 
+    "Compile/run a file based on its extension"
+    (interactive "P")
+    (setq file-extension (file-name-extension buffer-file-name))
+    (setq executable-name (file-name-base buffer-file-name))
+    (message executable-name)
+    (cond ((string= file-extension "c")
+	  (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
+	  ((string= file-extension "cpp")
+	   (compile (concat "g++ -o " executable-name " " buffer-file-name " && ./" executable-name)))
+	  ((string= file-extension "java")
+	  (compile (concat "javac " buffer-file-name " && java " executable-name)))
+    )
+)
 
 (defun config-visit ()
   (interactive)
@@ -137,10 +154,30 @@
 
 (setq org-capture-templates '(("t" "Todo [inbox]" entry
 			       (file+headline "~/gtd/inbox.org" "Tasks")
-			       "* TODO [#A] %i%?")
+			       "* TODO [#A] %i%?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
 			      ("T" "Tickler" entry
 			       (file+headline "~/gtd/tickler.org" "Tickler")
 			       "* %i%? \n %U")))
+
+(setq org-agenda-window-setup (quote current-window))
+
+(setq org-deadline-warning-days 7)
+
+(setq org-agenda-span (quote fortnight))
+
+(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+
+(setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
+
+(setq org-agenda-todo-ignore-deadlines (quote all))
+(setq org-agenda-todo-ignore-scheduled (quote all))
+
+(setq org-agenda-sorting-strategy
+      (quote
+       ((agenda deadline-up priority-down)
+	(todo priority-down category-keep)
+	(tags priority-down category-keep)
+	(search category-keep))))
 
 (setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
 
