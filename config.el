@@ -75,9 +75,9 @@
 (require 'use-package)
 ;; </use-package
 
-(setq ido-enable-flex-matching nil)
+(setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
-(setq ido-everywhere t)
+(setq ido-use-filename-at-point 'guess)
 (ido-mode 1)
 ;; (require 'ido)
 ;; (ido-mode t)
@@ -93,9 +93,28 @@
   (beacon-mode 1))
 
 (use-package avy
-  :ensure t
-  :bind
-  ("M-s" . avy-goto-char))
+  :ensure t)
+
+(defun avy-goto-char-n (&optional n arg beg end &rest chars)
+  (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
+		     (let ((count 1)
+			   (charList '()))
+		       (while (<= count (prefix-numeric-value current-prefix-arg))
+			 (push (read-char (format "char %d: " count) t) charList)
+			 (setq count (1+ count))
+			 )
+		       (reverse charList))
+		     )
+	       )
+  (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
+  (avy-with avy-goto-char-n
+    (avy--generic-jump
+     (regexp-quote (concat chars))
+     arg
+     avy-style
+     beg end)))
+
+(global-set-key (kbd "C-:") 'avy-goto-char-n)
 
 (use-package rainbow-mode
   :ensure t
@@ -123,12 +142,43 @@
   (setq powerline-default-separator (quote arrow)))
 
 (use-package helm
-  :ensure t)
+ :ensure t
+ :bind
+ ("M-x" . 'helm-M-x)
+ ;;("C-x r b" 'helm-filtered-bookmarks)
+ ("C-x C-f" . 'helm-find-files)
+ ("C-x C-b" . 'helm-buffers-list)
+ ;; ("C-i" . 'helm-execute-persistent-action)
+ :config
+ (setq helm-autoresize-max-height 0
+       helm-autoresize-min-height 40
+       helm-M-x-fuzzy-match t
+       helm-recentf-fuzzy-match t
+       helm-semantic-fuzzy-match t
+       helm-imenu-fuzzy-match t
+       helm-split-window-inside-p t
+       helm-move-to-line-cycle-in-source nil
+       helm-ff-search-library-in-sexp t
+       helm-scroll-amount 8
+       helm-echo-input-in-header-line t)
+ (when (executable-find "curl")
+   (setq helm-net-prefer-curl t))
+
+ :init
+ (helm-mode 1))
 
 (use-package magit
   :ensure t
   :bind
-  ("C-x g" . magit-status))
+  ("C-x g" . magit-status)
+  ("C-x M-g" . magit-dispatch))
+
+(use-package ivy
+  :ensure t)
+
+(use-package swiper
+  :ensure t
+  :bind ("C-s" . swiper))
 
 (use-package yasnippet
   :ensure t

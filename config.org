@@ -96,6 +96,168 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
+* Preinstalled packages
+** ido-mode
+#+BEGIN_SRC emacs-lisp
+  (setq ido-enable-flex-matching t)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-use-filename-at-point 'guess)
+  (ido-mode 1)
+  ;; (require 'ido)
+  ;; (ido-mode t)
+#+END_SRC
+** Whitespace
+#+BEGIN_SRC emacs-lisp
+  (require 'whitespace)
+  (setq whitespace-style '(face empty tabs lines-tail trailing))
+  (global-whitespace-mode t)
+#+END_SRC
+** Org
+*** Org-mode keybindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-switchb)
+#+END_SRC
+
+*** Require org-drill
+*** Set org-log-done to true
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done t)
+#+END_SRC
+
+*** Set org-mode agenda files
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files (list "~/gtd/inbox.org"
+			       "~/gtd/gtd.org"
+			       "~/gtd/tickler.org"))
+
+#+END_SRC
+
+*** Set priority range from A to C with default A
+#+BEGIN_SRC emacs-lisp
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?A)
+#+END_SRC
+
+*** Set colors for priorities
+#+BEGIN_SRC emacs-lisp
+  (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
+			     (?B . (:foreground "#FFA500"))
+			     (?C . (:foreground "#48D1CC"))))
+#+END_SRC
+
+*** Org-mode templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates '(("t" "Todo [inbox]" entry
+				 (file+headline "~/gtd/inbox.org" "Tasks")
+				 "* TODO [#A] %i%?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
+				("T" "Tickler" entry
+				 (file+headline "~/gtd/tickler.org" "Tickler")
+				 "* %i%? \n %U")))
+#+END_SRC
+*** open agenda in current window
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-window-setup (quote current-window))
+#+END_SRC
+
+*** Warn about any deadline in next 7 days
+#+BEGIN_SRC emacs-lisp
+  (setq org-deadline-warning-days 7)
+#+END_SRC
+
+*** Show tasks scheduled/due in next fortnight
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-span (quote fortnight))
+#+END_SRC
+
+*** Do not show tasks as scheduled if already shown as deadline
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+#+END_SRC
+
+*** Do not give warning colors to tasks w/ impending deadlines
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
+#+END_SRC
+
+*** Do not show tasks that are scheduled or have deadlines in normal todo list
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-todo-ignore-deadlines (quote all))
+  (setq org-agenda-todo-ignore-scheduled (quote all))
+#+END_SRC
+
+*** How tasks should be sorted
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-sorting-strategy
+	(quote
+	 ((agenda deadline-up priority-down)
+	  (todo priority-down category-keep)
+	  (tags priority-down category-keep)
+	  (search category-keep))))
+#+END_SRC
+
+*** org-refile targets
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+#+END_SRC
+*** org-mode todo keywords
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+#+END_SRC
+
+*** Turn off org-goto-auto-isearch
+#+BEGIN_SRC emacs-lisp
+  (setq org-goto-auto-isearch nil)
+
+#+END_SRC
+*** Set org-indent to 2
+#+BEGIN_SRC emacs-lisp
+  (setq org-list-indent-offset 2)
+#+END_SRC
+*** Save clock history across emacs sessions
+#+BEGIN_SRC emacs-lisp
+  (setq org-clock-persist 'history)
+  (org-clock-persistence-insinuate)
+#+END_SRC
+
+*** Syntax highlight text in block
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
+*** Org Bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+*** Maximum indentation for description lists
+#+BEGIN_SRC emacs-lisp
+  (setq org-list-description-max-indent 5)
+#+END_SRC
+*** prevent demoting heading
+#+BEGIN_SRC emacs-lisp
+  (setq org-adapt-indentation nil)
+
+#+END_SRC
+
+*** Have org-mode support programming languages
+   #+BEGIN_SRC emacs-lisp
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '(
+	(shell . t)
+	(C . t)
+	(python . t)
+	(R . t)
+	(ditaa . t)
+	(gnuplot . t)
+	))
+   #+END_SRC
 
 * Extra Packages
 ** package-list
@@ -104,7 +266,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (require 'package)
   (setq package-enable-at-startup nil)
   (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/"))
+	       '("melpa" . "https://melpa.org/packages/")
+	       '("org" . "http://orgmode.org/elpa/"))
   (package-initialize)
 
   (unless (package-installed-p 'use-package)
@@ -113,15 +276,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (require 'use-package)
   ;; </use-package
 #+END_SRC
-** ido-mode
-#+BEGIN_SRC emacs-lisp
-  (setq ido-enable-flex-matching nil)
-  (setq ido-create-new-buffer 'always)
-  (setq ido-everywhere t)
-  (ido-mode 1)
-  ;; (require 'ido)
-  ;; (ido-mode t)
-#+END_SRC
+
 
 ** which-key
 #+BEGIN_SRC emacs-lisp
@@ -142,9 +297,28 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :ensure t
-    :bind
-    ("M-s" . avy-goto-char))
+    :ensure t)
+
+  (defun avy-goto-char-n (&optional n arg beg end &rest chars)
+    (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
+		       (let ((count 1)
+			     charList)
+			 (while (<= count (prefix-numeric-value current-prefix-arg))
+			   (push (read-char (format "char %d: " count) t) charList)
+			   (setq count (1+ count))
+			   )
+			 (reverse charList))
+		       )
+		 )
+    (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
+    (avy-with avy-goto-char-n
+      (avy--generic-jump
+       (regexp-quote (concat chars))
+       arg
+       avy-style
+       beg end)))
+
+  (global-set-key (kbd "C-:") 'avy-goto-char-n)
 #+END_SRC
 ** rainbow 
 #+BEGIN_SRC emacs-lisp
@@ -188,14 +362,60 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
-    :ensure t)
+   :ensure t
+   :bind
+   ("M-x" . 'helm-M-x)
+   ;;("C-x r b" 'helm-filtered-bookmarks)
+   ("C-x C-f" . 'helm-find-files)
+   ("C-x C-b" . 'helm-buffers-list)
+   ;; ("C-i" . 'helm-execute-persistent-action)
+   :config
+   (setq helm-autoresize-max-height 0
+	 helm-autoresize-min-height 40
+	 helm-M-x-fuzzy-match t
+	 helm-recentf-fuzzy-match t
+	 helm-semantic-fuzzy-match t
+	 helm-imenu-fuzzy-match t
+	 helm-split-window-inside-p t
+	 helm-move-to-line-cycle-in-source nil
+	 helm-ff-search-library-in-sexp t
+	 helm-scroll-amount 8
+	 helm-echo-input-in-header-line t)
+
+
+   (when (executable-find "curl")
+     (setq helm-net-prefer-curl t))
+
+   :init
+   (helm-mode 1))
+
+  (require 'helm-config)
+  (helm-autoresize-mode 1)
+  (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
 #+END_SRC
+
+
 ** Magit
+
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
     :bind
-    ("C-x g" . magit-status))
+    ("C-x g" . magit-status)
+    ("C-x M-g" . magit-dispatch))
+#+END_SRC
+** Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :ensure t)
+#+END_SRC
+
+** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . swiper-isearch))
+
 #+END_SRC
 ** Yasnippet
 #+BEGIN_SRC emacs-lisp
@@ -219,8 +439,12 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
     :ensure t
-    :bind ("M-y" . popup-kill-ring))
+    :bind ("M-y" . popup-kill-ring)
+    :config
+    (setq save-interprogram-paste-before-kill t))
+
 #+END_SRC
+
 ** htmlize
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize)
@@ -276,153 +500,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC elisp
   (use-package cider)
 #+END_SRC
-* Org
-** Org-mode keybindings
-#+BEGIN_SRC emacs-lisp
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-switchb)
-#+END_SRC
-
-** Require org-drill
-** Set org-log-done to true
-#+BEGIN_SRC emacs-lisp
-(setq org-log-done t)
-#+END_SRC
-
-** Set org-mode agenda files
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (list "~/gtd/inbox.org"
-			       "~/gtd/gtd.org"
-			       "~/gtd/tickler.org"))
-
-#+END_SRC
-
-** Set priority range from A to C with default A
-#+BEGIN_SRC emacs-lisp
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
-  (setq org-default-priority ?A)
-#+END_SRC
-
-** Set colors for priorities
-#+BEGIN_SRC emacs-lisp
-  (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
-			     (?B . (:foreground "#FFA500"))
-			     (?C . (:foreground "#48D1CC"))))
-#+END_SRC
-
-** Org-mode templates
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates '(("t" "Todo [inbox]" entry
-				 (file+headline "~/gtd/inbox.org" "Tasks")
-				 "* TODO [#A] %i%?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
-				("T" "Tickler" entry
-				 (file+headline "~/gtd/tickler.org" "Tickler")
-				 "* %i%? \n %U")))
-#+END_SRC
-** open agenda in current window
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-window-setup (quote current-window))
-#+END_SRC
-
-** Warn about any deadline in next 7 days
-#+BEGIN_SRC emacs-lisp
-  (setq org-deadline-warning-days 7)
-#+END_SRC
-
-** Show tasks scheduled/due in next fortnight
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-span (quote fortnight))
-#+END_SRC
-
-** Do not show tasks as scheduled if already shown as deadline
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-#+END_SRC
-
-** Do not give warning colors to tasks w/ impending deadlines
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
-#+END_SRC
-
-** Do not show tasks that are scheduled or have deadlines in normal todo list
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-todo-ignore-deadlines (quote all))
-  (setq org-agenda-todo-ignore-scheduled (quote all))
-#+END_SRC
-
-** How tasks should be sorted
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-sorting-strategy
-	(quote
-	 ((agenda deadline-up priority-down)
-	  (todo priority-down category-keep)
-	  (tags priority-down category-keep)
-	  (search category-keep))))
-#+END_SRC
-
-** org-refile targets
-#+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
-#+END_SRC
-** org-mode todo keywords
-#+BEGIN_SRC emacs-lisp
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
-#+END_SRC
-
-** Turn off org-goto-auto-isearch
-#+BEGIN_SRC emacs-lisp
-  (setq org-goto-auto-isearch nil)
-
-#+END_SRC
-** Set org-indent to 2
-#+BEGIN_SRC emacs-lisp
-  (setq org-list-indent-offset 2)
-#+END_SRC
-** Save clock history across emacs sessions
-#+BEGIN_SRC emacs-lisp
-  (setq org-clock-persist 'history)
-  (org-clock-persistence-insinuate)
-#+END_SRC
-
-** Syntax highlight text in block
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
-#+END_SRC
-** Org Bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-#+END_SRC
-** Maximum indentation for description lists
-#+BEGIN_SRC emacs-lisp
-  (setq org-list-description-max-indent 5)
-#+END_SRC
-** prevent demoting heading
-#+BEGIN_SRC emacs-lisp
-  (setq org-adapt-indentation nil)
-
-#+END_SRC
-
-** Have org-mode support programming languages
-   #+BEGIN_SRC emacs-lisp
-     (org-babel-do-load-languages
-      'org-babel-load-languages
-      '(
-	(shell . t)
-	(C . t)
-	(python . t)
-	(R . t)
-	(ditaa . t)
-	(gnuplot . t)
-	))
-   #+END_SRC
-
 * Terminal
 ** Setting default shell to bash
 #+BEGIN_SRC emacs-lisp
