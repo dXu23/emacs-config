@@ -62,19 +62,6 @@
   (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
 (global-set-key (kbd "C-c r") 'config-reload)
 
-;; <use-package>
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-(package-initialize)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(require 'use-package)
-;; </use-package
-
 (setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
 (setq ido-use-filename-at-point 'guess)
@@ -82,139 +69,9 @@
 ;; (require 'ido)
 ;; (ido-mode t)
 
-(use-package which-key
-  :ensure t
-  :init
-  (which-key-mode))
-
-(use-package beacon
-  :ensure t
-  :init
-  (beacon-mode 1))
-
-(use-package avy
-  :ensure t)
-
-(defun avy-goto-char-n (&optional n arg beg end &rest chars)
-  (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
-		     (let ((count 1)
-			   (charList '()))
-		       (while (<= count (prefix-numeric-value current-prefix-arg))
-			 (push (read-char (format "char %d: " count) t) charList)
-			 (setq count (1+ count))
-			 )
-		       (reverse charList))
-		     )
-	       )
-  (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
-  (avy-with avy-goto-char-n
-    (avy--generic-jump
-     (regexp-quote (concat chars))
-     arg
-     avy-style
-     beg end)))
-
-(global-set-key (kbd "C-:") 'avy-goto-char-n)
-
-(use-package rainbow-mode
-  :ensure t
-  :init (rainbow-mode 1))
-
-(use-package switch-window
-  :ensure t
-  :config
-  (setq switch-window-input-style 'minibuffer)
-  (setq switch-window-increase 4)
-  (setq switch-window-threshold 2)
-  (setq switch-window-shortcut-style 'qwerty)
-  (setq switch-window-qwerty-shortcuts
-	'("a" "s" "d" "f" "j" "k" "l"))
-  :bind
-  ([remap other-window] . switch-window))
-
-(use-package cider
-  :ensure t)
-
-(use-package spaceline
-  :ensure t
-  :config
-  (require 'spaceline-config)
-  (setq powerline-default-separator (quote arrow)))
-
-(use-package helm
- :ensure t
- :bind
- ("M-x" . 'helm-M-x)
- ;;("C-x r b" 'helm-filtered-bookmarks)
- ("C-x C-f" . 'helm-find-files)
- ("C-x C-b" . 'helm-buffers-list)
- ;; ("C-i" . 'helm-execute-persistent-action)
- :config
- (setq helm-autoresize-max-height 0
-       helm-autoresize-min-height 40
-       helm-M-x-fuzzy-match t
-       helm-recentf-fuzzy-match t
-       helm-semantic-fuzzy-match t
-       helm-imenu-fuzzy-match t
-       helm-split-window-inside-p t
-       helm-move-to-line-cycle-in-source nil
-       helm-ff-search-library-in-sexp t
-       helm-scroll-amount 8
-       helm-echo-input-in-header-line t)
- (when (executable-find "curl")
-   (setq helm-net-prefer-curl t))
-
- :init
- (helm-mode 1))
-
-(use-package magit
-  :ensure t
-  :bind
-  ("C-x g" . magit-status)
-  ("C-x M-g" . magit-dispatch))
-
-(use-package ivy
-  :ensure t)
-
-(use-package swiper
-  :ensure t
-  :bind ("C-s" . swiper))
-
-(use-package yasnippet
-  :ensure t
-  :config
-  (use-package yasnippet-snippets
-    :ensure t)
-  (yas-reload-all)
-  (yas-global-mode 1))
-
-(use-package 4clojure
-  :ensure t)
-
-(use-package popup-kill-ring
-  :ensure t
-  :bind ("M-y" . popup-kill-ring))
-
-(use-package htmlize)
-
-(tool-bar-mode -1)
-
-(menu-bar-mode -1)
-
-(scroll-bar-mode -1)
-
-(when window-system (global-hl-line-mode t))
-
-(when window-system (global-prettify-symbols-mode t))
-
-(set-frame-font "M+ 1mn")
-
-(unless (package-installed-p 'moe-theme)
-  (package-refresh-contents)
-  (package-install 'moe-theme))
-
-(require 'moe-theme)
-(moe-light)
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+(global-whitespace-mode t)
 
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -276,11 +133,6 @@
 
 (setq org-src-fontify-natively t)
 
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-
 (setq org-list-description-max-indent 5)
 
 (setq org-adapt-indentation nil)
@@ -295,6 +147,167 @@
    (ditaa . t)
    (gnuplot . t)
    ))
+
+;; <use-package>
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/")
+	     '("org" . "http://orgmode.org/elpa/"))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+;; </use-package
+
+(use-package avy
+  :ensure t)
+
+(defun avy-goto-char-n (&optional n arg beg end &rest chars)
+  (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
+		     (let ((count 1)
+			   charList)
+		       (while (<= count (prefix-numeric-value current-prefix-arg))
+			 (push (read-char (format "char %d: " count) t) charList)
+			 (setq count (1+ count))
+			 )
+		       (reverse charList))
+		     )
+	       )
+  (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
+  (avy-with avy-goto-char-n
+    (avy--generic-jump
+     (regexp-quote (concat chars))
+     arg
+     avy-style
+     beg end)))
+
+(global-set-key (kbd "C-:") 'avy-goto-char-n)
+
+(use-package beacon
+  :ensure t
+  :init
+  (beacon-mode 1))
+
+(use-package cider
+  :ensure t)
+
+(use-package helm
+ :ensure t
+ :bind
+ ("M-x" . 'helm-M-x)
+ ;;("C-x r b" 'helm-filtered-bookmarks)
+ ("C-x C-f" . 'helm-find-files)
+ ("C-x C-b" . 'helm-buffers-list)
+ ;; ("C-i" . 'helm-execute-persistent-action)
+ :config
+ (setq helm-autoresize-max-height 0
+       helm-autoresize-min-height 40
+       helm-M-x-fuzzy-match t
+       helm-recentf-fuzzy-match t
+       helm-semantic-fuzzy-match t
+       helm-imenu-fuzzy-match t
+       helm-split-window-inside-p t
+       helm-move-to-line-cycle-in-source nil
+       helm-ff-search-library-in-sexp t
+       helm-scroll-amount 8
+       helm-echo-input-in-header-line t)
+
+
+ (when (executable-find "curl")
+   (setq helm-net-prefer-curl t))
+
+ :init
+ (helm-mode 1))
+
+(require 'helm-config)
+(helm-autoresize-mode 1)
+(define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
+
+(use-package ivy
+  :ensure t)
+
+(use-package htmlize)
+
+(use-package magit
+  :ensure t
+  :bind
+  ("C-x g" . magit-status)
+  ("C-x M-g" . magit-dispatch))
+
+(use-package spaceline
+  :ensure t
+  :config
+  (require 'spaceline-config)
+  (setq powerline-default-separator (quote arrow)))
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+
+(use-package rainbow-mode
+  :ensure t
+  :init (rainbow-mode 1))
+
+(use-package swiper
+  :ensure t
+  :bind ("C-s" . swiper-isearch))
+
+(use-package switch-window
+  :ensure t
+  :config
+  (setq switch-window-input-style 'minibuffer)
+  (setq switch-window-increase 4)
+  (setq switch-window-threshold 2)
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+	'("a" "s" "d" "f" "j" "k" "l"))
+  :bind
+  ([remap other-window] . switch-window))
+
+(use-package popup-kill-ring
+  :ensure t
+  :bind ("M-y" . popup-kill-ring)
+  :config
+  (setq save-interprogram-paste-before-kill t))
+
+(use-package which-key
+  :ensure t
+  :init
+  (which-key-mode))
+
+(use-package 4clojure
+  :ensure t)
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (use-package yasnippet-snippets
+    :ensure t)
+  (yas-reload-all)
+  (yas-global-mode 1))
+
+(tool-bar-mode -1)
+
+(menu-bar-mode -1)
+
+(scroll-bar-mode -1)
+
+(when window-system (global-hl-line-mode t))
+
+(when window-system (global-prettify-symbols-mode t))
+
+(set-frame-font "M+ 1mn")
+
+(unless (package-installed-p 'moe-theme)
+  (package-refresh-contents)
+  (package-install 'moe-theme))
+
+(require 'moe-theme)
+(moe-light)
 
 (defvar my-term-shell "/bin/bash")
 (defadvice ansi-term (before force-bash)

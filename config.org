@@ -1,5 +1,21 @@
 
 Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
+
+* config edit/reload
+** edit
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+** reload
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
 * 'Fixing' Emacs
 ** Set emacs so that scratch buffer shows up instead of help screen
 #+BEGIN_SRC emacs-lisp
@@ -34,12 +50,12 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
 #+END_SRC
-** Some preferred keybindings
-*** Set 'M-S-z' to zap-up-to-char
+* Some preferred keybindings
+** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\M-Z" 'zap-up-to-char)
 #+END_SRC
-*** Split and follow function
+** Split and follow function
 #+BEGIN_SRC emacs-lisp
   (defun split-and-follow-horizontally ()
     "Splits a window horizontally and follows to opened window"
@@ -62,7 +78,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
-*** Making compiling easier
+** Making compiling easier
 #+BEGIN_SRC emacs-lisp
   (defun compile-based-on-extension (&optional args) 
       "Compile/run a file based on its extension"
@@ -80,21 +96,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 
 #+END_SRC
+** Insert date and time easily
+#+BEGIN_SRC emacs-lisp
+  (defun mp-insert-date ()
+    (interactive)
+    (insert (format-time-string "%x")))
 
-* config edit/reload
-** edit
-#+BEGIN_SRC emacs-lisp
-  (defun config-visit ()
+  (defun mp-insert-time ()
     (interactive)
-    (find-file "~/.emacs.d/config.org"))
-  (global-set-key (kbd "C-c e") 'config-visit)
-#+END_SRC
-** reload
-#+BEGIN_SRC emacs-lisp
-  (defun config-reload ()
-    (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
-  (global-set-key (kbd "C-c r") 'config-reload)
+    (insert (format-time-string "%X")))
+
+  (global-set-key (kbd "C-c i d") 'mp-insert-date)
+  (global-set-key (kbd "C-c i t") 'mp-insert-time)
 #+END_SRC
 * Preinstalled packages
 ** ido-mode
@@ -228,13 +241,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (setq org-src-fontify-natively t)
 #+END_SRC
-*** Org Bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-#+END_SRC
 *** Maximum indentation for description lists
 #+BEGIN_SRC emacs-lisp
   (setq org-list-description-max-indent 5)
@@ -277,23 +283,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;; </use-package
 #+END_SRC
 
-
-** which-key
-#+BEGIN_SRC emacs-lisp
-(use-package which-key
-  :ensure t
-  :init
-  (which-key-mode))
-#+END_SRC
-
-** beacon
-#+BEGIN_SRC emacs-lisp
-(use-package beacon
-  :ensure t
-  :init
-  (beacon-mode 1))
-#+END_SRC
-
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -320,44 +309,19 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
   (global-set-key (kbd "C-:") 'avy-goto-char-n)
 #+END_SRC
-** rainbow 
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t
-    :init (rainbow-mode 1))
 
-#+END_SRC
-** switch-window
-    Package to switch windows more quickly; Pressing C-x o now brings up a menu of keys
-    corresponding to the window one wants to switch to
+** beacon
 #+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :ensure t
-    :config
-    (setq switch-window-input-style 'minibuffer)
-    (setq switch-window-increase 4)
-    (setq switch-window-threshold 2)
-    (setq switch-window-shortcut-style 'qwerty)
-    (setq switch-window-qwerty-shortcuts
-	  '("a" "s" "d" "f" "j" "k" "l"))
-    :bind
-    ([remap other-window] . switch-window))
-
+(use-package beacon
+  :ensure t
+  :init
+  (beacon-mode 1))
 #+END_SRC
 ** Cider
     Package for clojure
 #+BEGIN_SRC emacs-lisp
   (use-package cider
     :ensure t)
-#+END_SRC
-** Modeline
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :config
-    (require 'spaceline-config)
-    (setq powerline-default-separator (quote arrow)))
-
 #+END_SRC
 ** Helm
 #+BEGIN_SRC emacs-lisp
@@ -393,7 +357,16 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (helm-autoresize-mode 1)
   (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
 #+END_SRC
+** Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :ensure t)
+#+END_SRC
 
+** htmlize
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize)
+#+END_SRC
 
 ** Magit
 
@@ -404,10 +377,28 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
 #+END_SRC
-** Ivy
+** Modeline
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t)
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow)))
+
+#+END_SRC
+** Org Bullets
+ #+BEGIN_SRC emacs-lisp
+   (use-package org-bullets
+     :ensure t
+     :config
+     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+ #+END_SRC
+** rainbow 
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init (rainbow-mode 1))
+
 #+END_SRC
 
 ** Swiper
@@ -417,22 +408,22 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind ("C-s" . swiper-isearch))
 
 #+END_SRC
-** Yasnippet
+** switch-window
+    Package to switch windows more quickly; Pressing C-x o now brings up a menu of keys
+    corresponding to the window one wants to switch to
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
+  (use-package switch-window
     :ensure t
     :config
-    (use-package yasnippet-snippets
-      :ensure t)
-    (yas-reload-all)
-    (yas-global-mode 1))
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increase 4)
+    (setq switch-window-threshold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+	  '("a" "s" "d" "f" "j" "k" "l"))
+    :bind
+    ([remap other-window] . switch-window))
 
-#+END_SRC
-
-** 4clojure
-#+BEGIN_SRC emacs-lisp
-  (use-package 4clojure
-    :ensure t)
 #+END_SRC
 
 ** popup-kill-ring
@@ -445,9 +436,29 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 #+END_SRC
 
-** htmlize
+** which-key
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
+(use-package which-key
+  :ensure t
+  :init
+  (which-key-mode))
+#+END_SRC
+
+** 4clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package 4clojure
+    :ensure t)
+#+END_SRC
+** Yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (use-package yasnippet-snippets
+      :ensure t)
+    (yas-reload-all)
+    (yas-global-mode 1))
+
 #+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces
