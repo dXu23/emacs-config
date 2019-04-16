@@ -1,3 +1,13 @@
+(defun config-visit ()
+  (interactive)
+  (find-file "~/.emacs.d/config.org"))
+(global-set-key (kbd "C-c e") 'config-visit)
+
+(defun config-reload ()
+  (interactive)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+(global-set-key (kbd "C-c r") 'config-reload)
+
 (setq inhibit-startup-message t)
 
 (setq x-select-enable-clipboard-manager nil)
@@ -52,15 +62,16 @@
     )
 )
 
-(defun config-visit ()
+(defun mp-insert-date ()
   (interactive)
-  (find-file "~/.emacs.d/config.org"))
-(global-set-key (kbd "C-c e") 'config-visit)
+  (insert (format-time-string "%x")))
 
-(defun config-reload ()
+(defun mp-insert-time ()
   (interactive)
-  (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
-(global-set-key (kbd "C-c r") 'config-reload)
+  (insert (format-time-string "%X")))
+
+(global-set-key (kbd "C-c i d") 'mp-insert-date)
+(global-set-key (kbd "C-c i t") 'mp-insert-time)
 
 (setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
@@ -167,22 +178,23 @@
 
 (defun avy-goto-char-n (&optional n arg beg end &rest chars)
   (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
-		     (let ((count 1)
-			   charList)
-		       (while (<= count (prefix-numeric-value current-prefix-arg))
-			 (push (read-char (format "char %d: " count) t) charList)
-			 (setq count (1+ count))
-			 )
-		       (reverse charList))
-		     )
-	       )
+      (let ((count 1)
+	   (charList '()))
+	       (while (<= count (prefix-numeric-value current-prefix-arg))
+		 (push (read-char (format "char %d: " count) t) charList)
+		 (setq count (1+ count))
+		 )
+	       (reverse charList))
+	     )
+  )
+
   (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
   (avy-with avy-goto-char-n
-    (avy--generic-jump
+    (avy-jump
      (regexp-quote (concat chars))
-     arg
-     avy-style
-     beg end)))
+     :window-flip arg
+     :beg beg
+     :end end)))
 
 (global-set-key (kbd "C-:") 'avy-goto-char-n)
 
@@ -226,6 +238,34 @@
 (helm-autoresize-mode 1)
 (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
 
+(use-package hydra
+  :config
+  (defhydra hydra-zoom (global-map "<f>")
+    "zoom"
+    ("g" text-scale-increase "in")
+    ("l" text-scale-decrease "out"))
+
+  (global-set-key
+   (kbd "C-n")
+   (defhydra hydra-move
+     (:body-pre (next-line))
+     "move"
+     ("n" next-line)
+     ("p" previous-line)
+     ("f" forward-char)
+     ("F" forward-word)
+     ("b" backward-char)
+     ("B" backward-word)
+     ("a" move-beginning-of-line)
+     ("A" backward-sentence)
+     ("e" move-end-of-line)
+     ("E" forward-sentence)
+     ("v" scroll-up-command)
+     ("V" scroll-down-command)
+     ("l" recenter-top-bottom))
+   )
+  )
+
 (use-package ivy
   :ensure t)
 
@@ -237,20 +277,20 @@
   ("C-x g" . magit-status)
   ("C-x M-g" . magit-dispatch))
 
-(use-package spaceline
-  :ensure t
-  :config
-  (require 'spaceline-config)
-  (setq powerline-default-separator (quote arrow)))
+;; (use-package spaceline
+;;   :ensure t
+;;   :config
+;;   (require 'spaceline-config)
+;;   (setq powerline-default-separator (quote arrow)))
 
 (use-package org-bullets
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
-(use-package rainbow-mode
-  :ensure t
-  :init (rainbow-mode 1))
+;; (use-package rainbow-mode
+;;  :ensure t
+;;  :init (rainbow-mode 1))
 
 (use-package swiper
   :ensure t
@@ -295,6 +335,63 @@
 (menu-bar-mode -1)
 
 (scroll-bar-mode -1)
+
+(column-number-mode 1)
+(set-face-attribute 'mode-line nil :background "light blue")
+(set-face-attribute 'mode-line-buffer-id nil :background "blue" :foreground)
+(defface mode-line-directory
+  '((t : background "blue" :foreground "gray"))
+  "Face used for buffer identification parts of the mode line."
+  :group 'mode-line-faces
+  :group 'basic-faces)
+
+(set-face-attribute 'mode-line-highlight nil :box nil :background "deep sky blue")
+(set-face-attribute 'mode-line-inactive nil :inherit 'default)
+
+(setq mode-line-position
+      '((line-number-mode ("%l" (column-number-mode ":%c")))))
+
+(defun shorten-directory (dir max-length)
+  "Show up to `max-length' characters of a directory name `dir'."
+  (let ((path (reverse (split-string (abbreviate-file-name dir) "/")))
+	(output ""))
+    (when (and path (equal "" (car path)))
+      (setq path (cdr path)))
+    (while (and path (< (length output) (- max-length 4)))
+      (setq output (concat (car path) "/" output))
+      (setq path (cdr path)))
+    (when path
+      (setq output (concat ".../" output)))
+    output))
+
+(defvar mode-line-directory
+  '(:propertize
+    (:eval (if (buffer-file-name) (concat " " (shorten-directory default-directory 20)) " "))
+    face mode-line-directory)
+  "Formats the current directory.")
+(put 'mode-line-directory 'risky-local-variable t)
+
+(setq-default mode-line-buffer-identification
+	      (propertized-buffer-identification "%b "))
+
+(setq-default mode-line-format
+	      '("%e"
+		mode-line-front-space
+		;; mode-line-mule-info --
+		mode-line-client
+		mode-line-modified
+		;; mode-line-remote -- no need to indicate this specially
+		;; mode-line-frame-identification
+		" "
+		mode-line-directory
+		mode-line-buffer-identication
+		" "
+		mode-line-position
+		(flycheck-mode flycheck-mode-line)
+		" "
+		mode-line-modes
+		mode-line-misc-info
+		mode-line-end-spaces))
 
 (when window-system (global-hl-line-mode t))
 
