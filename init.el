@@ -45,7 +45,8 @@
  '(jdee-server-dir "~/jdee-server/target/")
  '(package-selected-packages
    (quote
-    (org-plus-contrib python-mode flycheck arduino-mode hydra ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
+    (paradox auctex counsel company-jedi exec-path-from-shell company-irony company org-plus-contrib python-mode flycheck arduino-mode hydra ivy swiper yasnippet-snippets yasnippet magit htmlize helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein)))
+ '(paradox-github-token t))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
