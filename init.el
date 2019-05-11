@@ -45,11 +45,7 @@
  '(jdee-server-dir "~/jdee-server/target/")
  '(package-selected-packages
    (quote
-<<<<<<< HEAD
-    (org-plus-contrib python-mode flycheck arduino-mode hydra ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
-=======
-    (company-jedi org company-irony company ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
+    (org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)

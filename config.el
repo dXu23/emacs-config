@@ -25,13 +25,10 @@
 (setq register-separator ?+)
 (set-register register-separator "\n\n")
 
-<<<<<<< HEAD
-=======
 (prefer-coding-system 'utf-8)
 
 (setq display-line-numbers 'relative)
 
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 (global-set-key "\M-Z" 'zap-up-to-char)
 
 (defun split-and-follow-horizontally ()
@@ -69,6 +66,11 @@
     )
 )
 
+(defun my-compile ()
+  (interactive)
+  (let ((default-directory (locate-dominating-file "." "Makefile")))
+    (compile "make")))
+
 (defun mp-insert-date ()
   (interactive)
   (insert (format-time-string "%x")))
@@ -79,6 +81,14 @@
 
 (global-set-key (kbd "C-c i d") 'mp-insert-date)
 (global-set-key (kbd "C-c i t") 'mp-insert-time)
+
+(defun my-copy-rectangle (start end)
+   "Copy the region-rectangle instead of `kill-rectangle'."
+   (interactive "r")
+   (delete-rectangle start end)
+   (setq killed-rectangle (extract-rectangle start end)))
+
+(global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 
 (setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
@@ -96,7 +106,9 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-switchb)
 
-(setq org-log-done t)
+;; (require 'org-checklist)
+
+(setq org-log-done 'note)
 
 (setq org-agenda-files '("~/gtd/inbox.org"
 			 "~/gtd/gtd.org"
@@ -137,7 +149,9 @@
 	(tags priority-down category-keep)
 	(search category-keep))))
 
-(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+(setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+			   ("~/gtd/someday.org" :level . 1)
+			   ("~/gtd/tickler.org" :maxlevel . 2)))
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
@@ -169,17 +183,11 @@
 ;; <use-package>
 (require 'package)
 (setq package-enable-at-startup nil)
-<<<<<<< HEAD
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/")
-	     '("org" . "http://orgmode.org/elpa/"))
-=======
 (setq package-archives
 	     '(("melpa" . "https://melpa.org/packages/")
 	       ("gnu" . "https://elpa.gnu.org/packages/")
 	       ("org" . "http://orgmode.org/elpa/")))
 
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -221,39 +229,6 @@
 (use-package cider
   :ensure t)
 
-<<<<<<< HEAD
-(use-package helm
- :ensure t
- :bind
- ("M-x" . 'helm-M-x)
- ;;("C-x r b" 'helm-filtered-bookmarks)
- ("C-x C-f" . 'helm-find-files)
- ("C-x C-b" . 'helm-buffers-list)
- ;; ("C-i" . 'helm-execute-persistent-action)
- :config
- (setq helm-autoresize-max-height 0
-       helm-autoresize-min-height 40
-       helm-M-x-fuzzy-match t
-       helm-recentf-fuzzy-match t
-       helm-semantic-fuzzy-match t
-       helm-imenu-fuzzy-match t
-       helm-split-window-inside-p t
-       helm-move-to-line-cycle-in-source nil
-       helm-ff-search-library-in-sexp t
-       helm-scroll-amount 8
-       helm-echo-input-in-header-line t)
-
-
- (when (executable-find "curl")
-   (setq helm-net-prefer-curl t))
-
- :init
- (helm-mode 1))
-
-(require 'helm-config)
-(helm-autoresize-mode 1)
-(define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
-=======
 (use-package company
   :ensure t
   :config
@@ -309,41 +284,6 @@
     (exec-path-from-shell-initialize))
   )
 
-;; (use-package helm
-;;  :ensure t
-;;  :bind
-;;  ("M-x" . 'helm-M-x)
-;;  ("C-x r b" . 'helm-filtered-bookmarks)
-;;  ("C-c h" . 'helm-command-prefix)
-;;  ("C-x C-f" . 'helm-find-files)
-;;  ("C-x C-b" . 'helm-buffers-list)
-;;  ;; ("C-i" . 'helm-execute-persistent-action)
-;;  :config
-;;  (setq helm-autoresize-max-height 0
-;;	 helm-autoresize-min-height 40
-;;	 helm-M-x-fuzzy-match t
-;;	 helm-recentf-fuzzy-match t
-;;	 helm-semantic-fuzzy-match t
-;;	 helm-imenu-fuzzy-match t
-;;	 helm-split-window-inside-p t
-;;	 helm-move-to-line-cycle-in-source nil
-;;	 helm-ff-search-library-in-sexp t
-;;	 helm-scroll-amount 8
-;;	 helm-echo-input-in-header-line t)
-;;
-;;
-;;  (when (executable-find "curl")
-;;    (setq helm-net-prefer-curl t))
-;;
-;;  :init
-;;  (helm-mode 1))
-;;
-;; (require 'helm-config)
-;; (helm-autoresize-mode 1)
-;; (global-unset-key (kbd "C-x c"))
-;; (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
-
 (use-package hydra
   :config
   (defhydra hydra-zoom (global-map "<f>")
@@ -398,10 +338,9 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
-<<<<<<< HEAD
-=======
 (require 'org-drill)
 
+(use-package python-mode)
 ;;use-package 'python-mode
 ;; :config
 ;; (setq-default py-shell-name "ipython")
@@ -417,7 +356,6 @@
 ;; (setq py-smart-indentation t)
 ;;
 
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 ;; (use-package rainbow-mode
 ;;  :ensure t
 ;;  :init (rainbow-mode 1))
