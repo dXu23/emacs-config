@@ -29,6 +29,8 @@
 
 (prefer-coding-system 'utf-8)
 
+(setq display-line-numbers 'relative)
+
 (global-set-key "\M-Z" 'zap-up-to-char)
 
 (defun split-and-follow-horizontally ()
@@ -110,9 +112,9 @@
 
 (setq org-log-done t)
 
-(setq org-agenda-files (list "~/gtd/inbox.org"
-			     "~/gtd/gtd.org"
-			     "~/gtd/tickler.org"))
+(setq org-agenda-files '("~/gtd/inbox.org"
+			 "~/gtd/gtd.org"
+			 "~/gtd/tickler.org"))
 
 (setq org-highest-priority ?A)
 (setq org-lowest-priority ?C)
@@ -181,10 +183,10 @@
 ;; <use-package>
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(setq package-archives
+	     '(("melpa" . "https://melpa.org/packages/")
+	       ("gnu" . "https://elpa.gnu.org/packages/")
+	       ("org" . "http://orgmode.org/elpa/")))
 
 (package-initialize)
 
@@ -264,7 +266,6 @@
   :ensure t
   :after company
   :config
-  (require 'company)
   (add-to-list 'company-backends 'company-irony)
   )
 
@@ -403,6 +404,10 @@
 ;;   (require 'spaceline-config)
 ;;   (setq powerline-default-separator (quote arrow)))
 
+(use-package org
+  :ensure org-plus-contrib
+  )
+
 (use-package org-bullets
   :ensure t
   :config
@@ -410,18 +415,20 @@
 
 (require 'org-drill)
 
-(require 'python-mode)
-(setq-default py-shell-name "ipython")
-(setq-default py-which-bufname "IPython")
-
-(setq py-force-py-shell-name-p t)
-
-(setq py-shell-switch-buffers-on-execute-p t)
-(setq py-switch-buffers-on-execute-p t)
-
-(setq py-split-windows-on-execute-p nil)
-
-(setq py-smart-indentation t)
+;;use-package 'python-mode
+;; :config
+;; (setq-default py-shell-name "ipython")
+;; (setq-default py-which-bufname "IPython")
+;;
+;; (setq py-force-py-shell-name-p t)
+;;
+;; (setq py-shell-switch-buffers-on-execute-p t)
+;; (setq py-switch-buffers-on-execute-p t)
+;;
+;; (setq py-split-windows-on-execute-p nil)
+;;
+;; (setq py-smart-indentation t)
+;;
 
 ;; (use-package rainbow-mode
 ;;  :ensure t

@@ -1,6 +1,7 @@
 
 Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
+
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -58,7 +59,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+begin_src emacs-lisp
   (prefer-coding-system 'utf-8)
 #+end_src
-
+** Relative line numbers
+#+BEGIN_SRC emacs-lisp
+  (setq display-line-numbers 'relative)
+#+END_SRC
 * Some preferred keybindings
 ** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
@@ -162,16 +166,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 ;; (require 'org-checklist)
 #+END_SRC
+
+
 *** Set org-log-done to true
 #+BEGIN_SRC emacs-lisp
-(setq org-log-done t)
+(setq org-log-done 'note)
 #+END_SRC
 
 *** Set org-mode agenda files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (list "~/gtd/inbox.org"
-			       "~/gtd/gtd.org"
-			       "~/gtd/tickler.org"))
+  (setq org-agenda-files '("~/gtd/inbox.org"
+			   "~/gtd/gtd.org"
+			   "~/gtd/tickler.org"))
 
 #+END_SRC
 
@@ -241,7 +247,9 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 *** org-refile targets
 #+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+  (setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+			     ("~/gtd/someday.org" :level . 1)
+			     ("~/gtd/tickler.org" :maxlevel . 2)))
 #+END_SRC
 *** org-mode todo keywords
 #+BEGIN_SRC emacs-lisp
@@ -298,10 +306,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;; <use-package>
   (require 'package)
   (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/"))
-
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (setq package-archives
+	       '(("melpa" . "https://melpa.org/packages/")
+		 ("gnu" . "https://elpa.gnu.org/packages/")
+		 ("org" . "http://orgmode.org/elpa/")))
 
   (package-initialize)
 
@@ -396,7 +404,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :ensure t
     :after company
     :config
-    (require 'company)
     (add-to-list 'company-backends 'company-irony)
     )
 #+END_SRC
@@ -560,6 +567,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;;   (setq powerline-default-separator (quote arrow)))
 
 #+END_SRC
+** Org
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    )
+
+#+END_SRC
 ** Org Bullets
  #+BEGIN_SRC emacs-lisp
    (use-package org-bullets
@@ -573,21 +587,20 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 ** Python mode
 #+BEGIN_SRC emacs-lisp
-  (require 'python-mode)
-  (setq-default py-shell-name "ipython")
-  (setq-default py-which-bufname "IPython")
-
-  (setq py-force-py-shell-name-p t)
-
-  (setq py-shell-switch-buffers-on-execute-p t)
-  (setq py-switch-buffers-on-execute-p t)
-
-  (setq py-split-windows-on-execute-p nil)
-
-  (setq py-smart-indentation t)
-
-
-
+  ;;use-package 'python-mode
+  ;; :config
+  ;; (setq-default py-shell-name "ipython")
+  ;; (setq-default py-which-bufname "IPython")
+  ;;
+  ;; (setq py-force-py-shell-name-p t)
+  ;;
+  ;; (setq py-shell-switch-buffers-on-execute-p t)
+  ;; (setq py-switch-buffers-on-execute-p t)
+  ;;
+  ;; (setq py-split-windows-on-execute-p nil)
+  ;;
+  ;; (setq py-smart-indentation t)
+  ;;
 #+END_SRC
 ** rainbow
 #+BEGIN_SRC emacs-lisp
