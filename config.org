@@ -17,10 +17,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * 'Fixing' Emacs
-** View agenda on startup
-#+begin_src emacs-lisp
-(add-hook 'after-init-hook 'org-agenda-list)
-#+end_src
 ** Set emacs so that scratch buffer shows up instead of help screen
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-message t)
@@ -54,11 +50,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
 #+END_SRC
-** utf-8
-#+begin_src emacs-lisp
-  (prefer-coding-system 'utf-8)
-#+end_src
-
 * Some preferred keybindings
 ** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
@@ -123,7 +114,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (global-set-key (kbd "C-c i d") 'mp-insert-date)
   (global-set-key (kbd "C-c i t") 'mp-insert-time)
 #+END_SRC
-** Copy rectangle region
+** Copy rectangle region 
 #+BEGIN_SRC emacs-lisp
    (defun my-copy-rectangle (start end)
      "Copy the region-rectangle instead of `kill-rectangle'."
@@ -160,7 +151,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 *** Require org-drill
 #+BEGIN_SRC emacs-lisp
-;; (require 'org-checklist)
+(require 'org-checklist)
 #+END_SRC
 *** Set org-log-done to true
 #+BEGIN_SRC emacs-lisp
@@ -353,190 +344,80 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package cider
     :ensure t)
 #+END_SRC
-** Company
-#+BEGIN_SRC emacs-lisp
-    (use-package company
-      :ensure t
-      :config
-      (setq company-idle-delay 0.5)
-      (setq company-show-numbers t)
-      (setq company-minimum-prefix-length 3)
-      :bind (:map company-active-map
-		  ("M-n" . nil)
-		  ("M-p" . nil)
-		  ("C-n" . company-select-next)
-		  ("C-p" . company-select-previous)
-		  ("SPC" . company-abort)
-		  )
-      )
-
-      (defun ora-company-number ()
-	"Forward to `company-complete-number'. 
-
-	 Unless the number is potentially part of the candidate.
-	 In that case, insert the number"
-	(interactive)
-	(let* ((k (this-command-keys))
-	     (re (concat "^" command-prefix k)))
-	(if (cl-find-if (lambda (s) (string-match re s))
-			company-candidates)
-	    (self-insert-command 1)
-	  (company-complete-number (string-to-number k)))))
-
-    ;;(mapc (lambda (x) (define-key company-active-map
-    ;;		   (format "%d" x)
-    ;;		   'ora-company-number))
-    ;;	  (number-sequence 0 9))
-
-
-#+END_SRC
-** Company-irony
-#+BEGIN_SRC emacs-lisp
-  (use-package company-irony
-    :ensure t
-    :after company
-    :config
-    (require 'company)
-    (add-to-list 'company-backends 'company-irony)
-    )
-#+END_SRC
-** Company-jedi
-#+BEGIN_SRC emacs-lisp
-  (use-package company-jedi
-    :config
-    (defun my/python-mode-hook ()
-      (add-to-list 'company-backends 'company-jedi))
-
-    (add-hook 'python-mode-hook 'my/python-mode-hook)
-    :after company
-  )
-#+END_SRC
-** Exec-from-path-initialize
-#+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
-    )
-#+END_SRC
 ** Helm
 #+BEGIN_SRC emacs-lisp
-;; (use-package helm
-;;  :ensure t
-;;  :bind
-;;  ("M-x" . 'helm-M-x)
-;;  ("C-x r b" . 'helm-filtered-bookmarks)
-;;  ("C-c h" . 'helm-command-prefix)
-;;  ("C-x C-f" . 'helm-find-files)
-;;  ("C-x C-b" . 'helm-buffers-list)
-;;  ;; ("C-i" . 'helm-execute-persistent-action)
-;;  :config
-;;  (setq helm-autoresize-max-height 0
-;;	 helm-autoresize-min-height 40
-;;	 helm-M-x-fuzzy-match t
-;;	 helm-recentf-fuzzy-match t
-;;	 helm-semantic-fuzzy-match t
-;;	 helm-imenu-fuzzy-match t
-;;	 helm-split-window-inside-p t
-;;	 helm-move-to-line-cycle-in-source nil
-;;	 helm-ff-search-library-in-sexp t
-;;	 helm-scroll-amount 8
-;;	 helm-echo-input-in-header-line t)
-;;
-;;
-;;  (when (executable-find "curl")
-;;    (setq helm-net-prefer-curl t))
-;;
-;;  :init
-;;  (helm-mode 1))
-;;
-;; (require 'helm-config)
-;; (helm-autoresize-mode 1)
-;; (global-unset-key (kbd "C-x c"))
-;; (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
+  (use-package helm
+   :ensure t
+   :bind
+   ("M-x" . 'helm-M-x)
+   ("C-x r b" 'helm-filtered-bookmarks)
+   ("C-c h" 'helm-command-prefix)
+   ("C-x C-f" . 'helm-find-files)
+   ("C-x C-b" . 'helm-buffers-list)
+   ;; ("C-i" . 'helm-execute-persistent-action)
+   :config
+   (setq helm-autoresize-max-height 0
+	 helm-autoresize-min-height 40
+	 helm-M-x-fuzzy-match t
+	 helm-recentf-fuzzy-match t
+	 helm-semantic-fuzzy-match t
+	 helm-imenu-fuzzy-match t
+	 helm-split-window-inside-p t
+	 helm-move-to-line-cycle-in-source nil
+	 helm-ff-search-library-in-sexp t
+	 helm-scroll-amount 8
+	 helm-echo-input-in-header-line t)
+
+
+   (when (executable-find "curl")
+     (setq helm-net-prefer-curl t))
+
+   :init
+   (helm-mode 1))
+
+  (require 'helm-config)
+  (helm-autoresize-mode 1)
+  (global-unset-key (kbd "C-x c"))
+  (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
 #+END_SRC
 ** Hydra
 #+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :config
-    (defhydra hydra-zoom (global-map "<f>")
-      "zoom"
-      ("g" text-scale-increase "in")
-      ("l" text-scale-decrease "out"))
+    (use-package hydra
+      :config
+      (defhydra hydra-zoom (global-map "<f>")
+	"zoom"
+	("g" text-scale-increase "in")
+	("l" text-scale-decrease "out"))
 
-
-    (global-set-key
-     (kbd "C-n")
-     (defhydra hydra-move
-       (:body-pre (next-line))
-       "move"
-       ("n" next-line)
-       ("p" previous-line)
-       ("f" forward-char)
-       ("F" forward-word)
-       ("b" backward-char)
-       ("B" backward-word)
-       ("a" move-beginning-of-line)
-       ("A" backward-sentence)
-       ("e" move-end-of-line)
-       ("E" forward-sentence)
-       ("v" scroll-up-command)
-       ("V" scroll-down-command)
-       ("l" recenter-top-bottom)
-       ("k" kill-line)
-       ("t" transpose-chars)
-       ("T" transpose-words)
-       ("w" kill-region)
-       ("z" zap-to-char)
-       ("Z" zap-up-to-char))
-     )
-    )
+      (global-set-key
+       (kbd "C-n")
+       (defhydra hydra-move
+	 (:body-pre (next-line))
+	 "move"
+	 ("n" next-line)
+	 ("p" previous-line)
+	 ("f" forward-char)
+	 ("F" forward-word)
+	 ("b" backward-char)
+	 ("B" backward-word)
+	 ("a" move-beginning-of-line)
+	 ("A" backward-sentence)
+	 ("e" move-end-of-line)
+	 ("E" forward-sentence)
+	 ("v" scroll-up-command)
+	 ("V" scroll-down-command)
+	 ("l" recenter-top-bottom))
+       )
+      )
 
 
 #+END_SRC
 ** Ivy
 #+BEGIN_SRC emacs-lisp
-(use-package ivy
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  :ensure t
-  :bind (("C-s" . swiper-isearch)
-	   ("M-x" . counsel-M-x)
-	   ("C-x C-f" . counsel-find-file)
-	   ("<f1> f" . counsel-describe-function)
-	   ("<f1> v" . counsel-describe-variable)
-	   ("<f1> l" . counsel-find-library)
-	   ("<f2> i" . 'counsel-info-lookup-symbol)
-	   ("<f2> u" . counsel-unicode-char)
-	   ("C-c C-c" . counsel-compile)
-	   ("C-c j" . counsel-git-grep)	 
-	   ("C-c k" . counsel-ag)
-	   ("C-c C-l" . counsel-locate)
-	   ("C-S-o" . counsel-rhythmbox)
-	   ("C-c C-r" . ivy-resume)
-	   )
-
-  :init
-  (ivy-mode 1))
-
-
+  (use-package ivy
+    :ensure t)
 #+END_SRC
-** Irony
-#+BEGIN_SRC emacs-lisp
-  (use-package irony
-    :ensure t
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-    )
 
-  (with-eval-after-load 'company
-    (add-hook 'c++-mode-hook 'company-mode)
-    (add-hook 'c-mode-hook 'company-mode)
-    )
-#+END_SRC
 ** htmlize
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize)
@@ -573,20 +454,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 ** Python mode
 #+BEGIN_SRC emacs-lisp
-  (require 'python-mode)
-  (setq-default py-shell-name "ipython")
-  (setq-default py-which-bufname "IPython")
-
-  (setq py-force-py-shell-name-p t)
-
-  (setq py-shell-switch-buffers-on-execute-p t)
-  (setq py-switch-buffers-on-execute-p t)
-
-  (setq py-split-windows-on-execute-p nil)
-
-  (setq py-smart-indentation t)
-
-
+  (use-package python-mode)
 
 #+END_SRC
 ** rainbow
@@ -601,11 +469,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
-    :after ivy
-    :bind (("C-s" . swiper-isearch)
-	   :map swiper-map
-	   ("C-n" . ivy-next-line))
-    )
+    :bind ("C-s" . swiper-isearch))
 
 #+END_SRC
 ** switch-window
@@ -626,12 +490,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 #+END_SRC
 
-** Paradox
-#+BEGIN_SRC emacs-lisp
-  (use-package paradox
-    :init (paradox-enable))
-#+END_SRC
-
 ** popup-kill-ring
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
@@ -650,6 +508,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (which-key-mode))
 #+END_SRC
 
+** 4clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package 4clojure
+    :ensure t)
+#+END_SRC
 ** Yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -665,10 +528,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Change default tab-with to 4 spaces
 #+BEGIN_SRC elisp
   (setq default-tab-width 4)
-#+END_SRC
-** Fringe mode
-#+BEGIN_SRC emacs-lisp
-(fringe-mode '(1 . 3))
 #+END_SRC
 ** Getting rid of all bars
 *** Tool bar
@@ -773,12 +632,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Clojure
 #+BEGIN_SRC elisp
   (use-package cider)
-#+END_SRC
-** Tex
-#+BEGIN_SRC emacs-lisp
-  (setq TeX-auto-save t)       
-  (setq TeX-parse-self t)      
-  (setq-default TeX-master nil)
 #+END_SRC
 * Terminal
 ** Setting default shell to bash

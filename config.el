@@ -8,8 +8,6 @@
   (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
 (global-set-key (kbd "C-c r") 'config-reload)
 
-(add-hook 'after-init-hook 'org-agenda-list)
-
 (setq inhibit-startup-message t)
 
 (setq x-select-enable-clipboard-manager nil)
@@ -26,8 +24,6 @@
 
 (setq register-separator ?+)
 (set-register register-separator "\n\n")
-
-(prefer-coding-system 'utf-8)
 
 (global-set-key "\M-Z" 'zap-up-to-char)
 
@@ -66,11 +62,6 @@
     )
 )
 
-(defun my-compile ()
-  (interactive)
-  (let ((default-directory (locate-dominating-file "." "Makefile")))
-    (compile "make")))
-
 (defun mp-insert-date ()
   (interactive)
   (insert (format-time-string "%x")))
@@ -81,14 +72,6 @@
 
 (global-set-key (kbd "C-c i d") 'mp-insert-date)
 (global-set-key (kbd "C-c i t") 'mp-insert-time)
-
-(defun my-copy-rectangle (start end)
-   "Copy the region-rectangle instead of `kill-rectangle'."
-   (interactive "r")
-   (delete-rectangle start end)
-   (setq killed-rectangle (extract-rectangle start end)))
-
-(global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 
 (setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
@@ -105,8 +88,6 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-switchb)
-
-;; (require 'org-checklist)
 
 (setq org-log-done t)
 
@@ -182,10 +163,8 @@
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-
+	     '("melpa" . "https://melpa.org/packages/")
+	     '("org" . "http://orgmode.org/elpa/"))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -227,95 +206,37 @@
 (use-package cider
   :ensure t)
 
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0.5)
-  (setq company-show-numbers t)
-  (setq company-minimum-prefix-length 3)
-  :bind (:map company-active-map
-	      ("M-n" . nil)
-	      ("M-p" . nil)
-	      ("C-n" . company-select-next)
-	      ("C-p" . company-select-previous)
-	      ("SPC" . company-abort)
-	      )
-  )
+(use-package helm
+ :ensure t
+ :bind
+ ("M-x" . 'helm-M-x)
+ ;;("C-x r b" 'helm-filtered-bookmarks)
+ ("C-x C-f" . 'helm-find-files)
+ ("C-x C-b" . 'helm-buffers-list)
+ ;; ("C-i" . 'helm-execute-persistent-action)
+ :config
+ (setq helm-autoresize-max-height 0
+       helm-autoresize-min-height 40
+       helm-M-x-fuzzy-match t
+       helm-recentf-fuzzy-match t
+       helm-semantic-fuzzy-match t
+       helm-imenu-fuzzy-match t
+       helm-split-window-inside-p t
+       helm-move-to-line-cycle-in-source nil
+       helm-ff-search-library-in-sexp t
+       helm-scroll-amount 8
+       helm-echo-input-in-header-line t)
 
-  (defun ora-company-number ()
-    "Forward to `company-complete-number'. 
 
-     Unless the number is potentially part of the candidate.
-     In that case, insert the number"
-    (interactive)
-    (let* ((k (this-command-keys))
-	 (re (concat "^" command-prefix k)))
-    (if (cl-find-if (lambda (s) (string-match re s))
-		    company-candidates)
-	(self-insert-command 1)
-      (company-complete-number (string-to-number k)))))
+ (when (executable-find "curl")
+   (setq helm-net-prefer-curl t))
 
-;;(mapc (lambda (x) (define-key company-active-map
-;;		   (format "%d" x)
-;;		   'ora-company-number))
-;;	  (number-sequence 0 9))
+ :init
+ (helm-mode 1))
 
-(use-package company-irony
-  :ensure t
-  :after company
-  :config
-  (require 'company)
-  (add-to-list 'company-backends 'company-irony)
-  )
-
-(use-package company-jedi
-  :config
-  (defun my/python-mode-hook ()
-    (add-to-list 'company-backends 'company-jedi))
-
-  (add-hook 'python-mode-hook 'my/python-mode-hook)
-  :after company
-)
-
-(use-package exec-path-from-shell
-  :config
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
-  )
-
-;; (use-package helm
-;;  :ensure t
-;;  :bind
-;;  ("M-x" . 'helm-M-x)
-;;  ("C-x r b" . 'helm-filtered-bookmarks)
-;;  ("C-c h" . 'helm-command-prefix)
-;;  ("C-x C-f" . 'helm-find-files)
-;;  ("C-x C-b" . 'helm-buffers-list)
-;;  ;; ("C-i" . 'helm-execute-persistent-action)
-;;  :config
-;;  (setq helm-autoresize-max-height 0
-;;	 helm-autoresize-min-height 40
-;;	 helm-M-x-fuzzy-match t
-;;	 helm-recentf-fuzzy-match t
-;;	 helm-semantic-fuzzy-match t
-;;	 helm-imenu-fuzzy-match t
-;;	 helm-split-window-inside-p t
-;;	 helm-move-to-line-cycle-in-source nil
-;;	 helm-ff-search-library-in-sexp t
-;;	 helm-scroll-amount 8
-;;	 helm-echo-input-in-header-line t)
-;;
-;;
-;;  (when (executable-find "curl")
-;;    (setq helm-net-prefer-curl t))
-;;
-;;  :init
-;;  (helm-mode 1))
-;;
-;; (require 'helm-config)
-;; (helm-autoresize-mode 1)
-;; (global-unset-key (kbd "C-x c"))
-;; (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
+(require 'helm-config)
+(helm-autoresize-mode 1)
+(define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
 
 (use-package hydra
   :config
@@ -323,7 +244,6 @@
     "zoom"
     ("g" text-scale-increase "in")
     ("l" text-scale-decrease "out"))
-
 
   (global-set-key
    (kbd "C-n")
@@ -342,52 +262,12 @@
      ("E" forward-sentence)
      ("v" scroll-up-command)
      ("V" scroll-down-command)
-     ("l" recenter-top-bottom)
-     ("k" kill-line)
-     ("t" transpose-chars)
-     ("T" transpose-words)
-     ("w" kill-region)
-     ("z" zap-to-char)
-     ("Z" zap-up-to-char))
+     ("l" recenter-top-bottom))
    )
   )
 
 (use-package ivy
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  :ensure t
-  :bind (("C-s" . swiper-isearch)
-	   ("M-x" . counsel-M-x)
-	   ("C-x C-f" . counsel-find-file)
-	   ("<f1> f" . counsel-describe-function)
-	   ("<f1> v" . counsel-describe-variable)
-	   ("<f1> l" . counsel-find-library)
-	   ("<f2> i" . 'counsel-info-lookup-symbol)
-	   ("<f2> u" . counsel-unicode-char)
-	   ("C-c C-c" . counsel-compile)
-	   ("C-c j" . counsel-git-grep)	 
-	   ("C-c k" . counsel-ag)
-	   ("C-c C-l" . counsel-locate)
-	   ("C-S-o" . counsel-rhythmbox)
-	   ("C-c C-r" . ivy-resume)
-	   )
-
-  :init
-  (ivy-mode 1))
-
-(use-package irony
-  :ensure t
-  :config
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  )
-
-(with-eval-after-load 'company
-  (add-hook 'c++-mode-hook 'company-mode)
-  (add-hook 'c-mode-hook 'company-mode)
-  )
+  :ensure t)
 
 (use-package htmlize)
 
@@ -408,32 +288,13 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
-(require 'org-drill)
-
-(require 'python-mode)
-(setq-default py-shell-name "ipython")
-(setq-default py-which-bufname "IPython")
-
-(setq py-force-py-shell-name-p t)
-
-(setq py-shell-switch-buffers-on-execute-p t)
-(setq py-switch-buffers-on-execute-p t)
-
-(setq py-split-windows-on-execute-p nil)
-
-(setq py-smart-indentation t)
-
 ;; (use-package rainbow-mode
 ;;  :ensure t
 ;;  :init (rainbow-mode 1))
 
 (use-package swiper
   :ensure t
-  :after ivy
-  :bind (("C-s" . swiper-isearch)
-	 :map swiper-map
-	 ("C-n" . ivy-next-line))
-  )
+  :bind ("C-s" . swiper-isearch))
 
 (use-package switch-window
   :ensure t
@@ -447,9 +308,6 @@
   :bind
   ([remap other-window] . switch-window))
 
-(use-package paradox
-  :init (paradox-enable))
-
 (use-package popup-kill-ring
   :ensure t
   :bind ("M-y" . popup-kill-ring)
@@ -461,6 +319,9 @@
   :init
   (which-key-mode))
 
+(use-package 4clojure
+  :ensure t)
+
 (use-package yasnippet
   :ensure t
   :config
@@ -468,8 +329,6 @@
     :ensure t)
   (yas-reload-all)
   (yas-global-mode 1))
-
-(fringe-mode '(1 . 3))
 
 (tool-bar-mode -1)
 
@@ -546,10 +405,6 @@
 
 (require 'moe-theme)
 (moe-light)
-
-(setq TeX-auto-save t)       
-(setq TeX-parse-self t)      
-(setq-default TeX-master nil)
 
 (defvar my-term-shell "/bin/bash")
 (defadvice ansi-term (before force-bash)
