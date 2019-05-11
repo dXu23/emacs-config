@@ -25,6 +25,13 @@
 (setq register-separator ?+)
 (set-register register-separator "\n\n")
 
+<<<<<<< HEAD
+=======
+(prefer-coding-system 'utf-8)
+
+(setq display-line-numbers 'relative)
+
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 (global-set-key "\M-Z" 'zap-up-to-char)
 
 (defun split-and-follow-horizontally ()
@@ -91,9 +98,9 @@
 
 (setq org-log-done t)
 
-(setq org-agenda-files (list "~/gtd/inbox.org"
-			     "~/gtd/gtd.org"
-			     "~/gtd/tickler.org"))
+(setq org-agenda-files '("~/gtd/inbox.org"
+			 "~/gtd/gtd.org"
+			 "~/gtd/tickler.org"))
 
 (setq org-highest-priority ?A)
 (setq org-lowest-priority ?C)
@@ -162,9 +169,17 @@
 ;; <use-package>
 (require 'package)
 (setq package-enable-at-startup nil)
+<<<<<<< HEAD
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/")
 	     '("org" . "http://orgmode.org/elpa/"))
+=======
+(setq package-archives
+	     '(("melpa" . "https://melpa.org/packages/")
+	       ("gnu" . "https://elpa.gnu.org/packages/")
+	       ("org" . "http://orgmode.org/elpa/")))
+
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -206,6 +221,7 @@
 (use-package cider
   :ensure t)
 
+<<<<<<< HEAD
 (use-package helm
  :ensure t
  :bind
@@ -237,6 +253,96 @@
 (require 'helm-config)
 (helm-autoresize-mode 1)
 (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
+=======
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0.5)
+  (setq company-show-numbers t)
+  (setq company-minimum-prefix-length 3)
+  :bind (:map company-active-map
+	      ("M-n" . nil)
+	      ("M-p" . nil)
+	      ("C-n" . company-select-next)
+	      ("C-p" . company-select-previous)
+	      ("SPC" . company-abort)
+	      )
+  )
+
+  (defun ora-company-number ()
+    "Forward to `company-complete-number'. 
+
+     Unless the number is potentially part of the candidate.
+     In that case, insert the number"
+    (interactive)
+    (let* ((k (this-command-keys))
+	 (re (concat "^" command-prefix k)))
+    (if (cl-find-if (lambda (s) (string-match re s))
+		    company-candidates)
+	(self-insert-command 1)
+      (company-complete-number (string-to-number k)))))
+
+;;(mapc (lambda (x) (define-key company-active-map
+;;		   (format "%d" x)
+;;		   'ora-company-number))
+;;	  (number-sequence 0 9))
+
+(use-package company-irony
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-irony)
+  )
+
+(use-package company-jedi
+  :config
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends 'company-jedi))
+
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
+  :after company
+)
+
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  )
+
+;; (use-package helm
+;;  :ensure t
+;;  :bind
+;;  ("M-x" . 'helm-M-x)
+;;  ("C-x r b" . 'helm-filtered-bookmarks)
+;;  ("C-c h" . 'helm-command-prefix)
+;;  ("C-x C-f" . 'helm-find-files)
+;;  ("C-x C-b" . 'helm-buffers-list)
+;;  ;; ("C-i" . 'helm-execute-persistent-action)
+;;  :config
+;;  (setq helm-autoresize-max-height 0
+;;	 helm-autoresize-min-height 40
+;;	 helm-M-x-fuzzy-match t
+;;	 helm-recentf-fuzzy-match t
+;;	 helm-semantic-fuzzy-match t
+;;	 helm-imenu-fuzzy-match t
+;;	 helm-split-window-inside-p t
+;;	 helm-move-to-line-cycle-in-source nil
+;;	 helm-ff-search-library-in-sexp t
+;;	 helm-scroll-amount 8
+;;	 helm-echo-input-in-header-line t)
+;;
+;;
+;;  (when (executable-find "curl")
+;;    (setq helm-net-prefer-curl t))
+;;
+;;  :init
+;;  (helm-mode 1))
+;;
+;; (require 'helm-config)
+;; (helm-autoresize-mode 1)
+;; (global-unset-key (kbd "C-x c"))
+;; (define-key helm-find-files-map (kbd "<tab>") 'helm-find-files-up-one-level)
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 
 (use-package hydra
   :config
@@ -283,11 +389,35 @@
 ;;   (require 'spaceline-config)
 ;;   (setq powerline-default-separator (quote arrow)))
 
+(use-package org
+  :ensure org-plus-contrib
+  )
+
 (use-package org-bullets
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
+<<<<<<< HEAD
+=======
+(require 'org-drill)
+
+;;use-package 'python-mode
+;; :config
+;; (setq-default py-shell-name "ipython")
+;; (setq-default py-which-bufname "IPython")
+;;
+;; (setq py-force-py-shell-name-p t)
+;;
+;; (setq py-shell-switch-buffers-on-execute-p t)
+;; (setq py-switch-buffers-on-execute-p t)
+;;
+;; (setq py-split-windows-on-execute-p nil)
+;;
+;; (setq py-smart-indentation t)
+;;
+
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 ;; (use-package rainbow-mode
 ;;  :ensure t
 ;;  :init (rainbow-mode 1))

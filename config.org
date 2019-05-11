@@ -1,6 +1,7 @@
 
 Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
+
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -50,6 +51,17 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
 #+END_SRC
+<<<<<<< HEAD
+=======
+** utf-8
+#+begin_src emacs-lisp
+  (prefer-coding-system 'utf-8)
+#+end_src
+** Relative line numbers
+#+BEGIN_SRC emacs-lisp
+  (setq display-line-numbers 'relative)
+#+END_SRC
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 * Some preferred keybindings
 ** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
@@ -153,16 +165,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (require 'org-checklist)
 #+END_SRC
+
+
 *** Set org-log-done to true
 #+BEGIN_SRC emacs-lisp
-(setq org-log-done t)
+(setq org-log-done 'note)
 #+END_SRC
 
 *** Set org-mode agenda files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (list "~/gtd/inbox.org"
-			       "~/gtd/gtd.org"
-			       "~/gtd/tickler.org"))
+  (setq org-agenda-files '("~/gtd/inbox.org"
+			   "~/gtd/gtd.org"
+			   "~/gtd/tickler.org"))
 
 #+END_SRC
 
@@ -232,7 +246,9 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 *** org-refile targets
 #+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5)))
+  (setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+			     ("~/gtd/someday.org" :level . 1)
+			     ("~/gtd/tickler.org" :maxlevel . 2)))
 #+END_SRC
 *** org-mode todo keywords
 #+BEGIN_SRC emacs-lisp
@@ -289,10 +305,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;; <use-package>
   (require 'package)
   (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/"))
-
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (setq package-archives
+	       '(("melpa" . "https://melpa.org/packages/")
+		 ("gnu" . "https://elpa.gnu.org/packages/")
+		 ("org" . "http://orgmode.org/elpa/")))
 
   (package-initialize)
 
@@ -344,6 +360,74 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (use-package cider
     :ensure t)
 #+END_SRC
+<<<<<<< HEAD
+=======
+** Company
+#+BEGIN_SRC emacs-lisp
+    (use-package company
+      :ensure t
+      :config
+      (setq company-idle-delay 0.5)
+      (setq company-show-numbers t)
+      (setq company-minimum-prefix-length 3)
+      :bind (:map company-active-map
+		  ("M-n" . nil)
+		  ("M-p" . nil)
+		  ("C-n" . company-select-next)
+		  ("C-p" . company-select-previous)
+		  ("SPC" . company-abort)
+		  )
+      )
+
+      (defun ora-company-number ()
+	"Forward to `company-complete-number'. 
+
+	 Unless the number is potentially part of the candidate.
+	 In that case, insert the number"
+	(interactive)
+	(let* ((k (this-command-keys))
+	     (re (concat "^" command-prefix k)))
+	(if (cl-find-if (lambda (s) (string-match re s))
+			company-candidates)
+	    (self-insert-command 1)
+	  (company-complete-number (string-to-number k)))))
+
+    ;;(mapc (lambda (x) (define-key company-active-map
+    ;;		   (format "%d" x)
+    ;;		   'ora-company-number))
+    ;;	  (number-sequence 0 9))
+
+
+#+END_SRC
+** Company-irony
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :ensure t
+    :after company
+    :config
+    (add-to-list 'company-backends 'company-irony)
+    )
+#+END_SRC
+** Company-jedi
+#+BEGIN_SRC emacs-lisp
+  (use-package company-jedi
+    :config
+    (defun my/python-mode-hook ()
+      (add-to-list 'company-backends 'company-jedi))
+
+    (add-hook 'python-mode-hook 'my/python-mode-hook)
+    :after company
+  )
+#+END_SRC
+** Exec-from-path-initialize
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+    )
+#+END_SRC
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 ** Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -441,6 +525,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;;   (setq powerline-default-separator (quote arrow)))
 
 #+END_SRC
+** Org
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    )
+
+#+END_SRC
 ** Org Bullets
  #+BEGIN_SRC emacs-lisp
    (use-package org-bullets
@@ -454,8 +545,25 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 ** Python mode
 #+BEGIN_SRC emacs-lisp
+<<<<<<< HEAD
   (use-package python-mode)
 
+=======
+  ;;use-package 'python-mode
+  ;; :config
+  ;; (setq-default py-shell-name "ipython")
+  ;; (setq-default py-which-bufname "IPython")
+  ;;
+  ;; (setq py-force-py-shell-name-p t)
+  ;;
+  ;; (setq py-shell-switch-buffers-on-execute-p t)
+  ;; (setq py-switch-buffers-on-execute-p t)
+  ;;
+  ;; (setq py-split-windows-on-execute-p nil)
+  ;;
+  ;; (setq py-smart-indentation t)
+  ;;
+>>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
 #+END_SRC
 ** rainbow
 #+BEGIN_SRC emacs-lisp
