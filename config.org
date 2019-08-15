@@ -60,7 +60,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (setq display-line-numbers 'relative)
 #+END_SRC
->>>>>>> ab2c689cdc1224231f0c195b69cd13c6dab8c4e2
+
 * Some preferred keybindings
 ** Set 'M-S-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
@@ -76,8 +76,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (other-window 1)
     )
 
-  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
-
+  
 
   (defun split-and-follow-vertically ()
     "Splits a window vertically and follows to opened window"
@@ -86,7 +85,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (balance-windows)
     (other-window 1)
     )
-
+ (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 ** Making compiling easier
@@ -125,7 +124,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (global-set-key (kbd "C-c i d") 'mp-insert-date)
   (global-set-key (kbd "C-c i t") 'mp-insert-time)
 #+END_SRC
-** Copy rectangle region 
+** Copy rectangle region
 #+BEGIN_SRC emacs-lisp
    (defun my-copy-rectangle (start end)
      "Copy the region-rectangle instead of `kill-rectangle'."
@@ -430,7 +429,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
     (use-package hydra
       :config
-      (defhydra hydra-zoom (global-map "<f>")
+      (defhydra hydra-zoom (global-map "<f2>")
 	"zoom"
 	("g" text-scale-increase "in")
 	("l" text-scale-decrease "out"))
@@ -477,15 +476,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
-#+END_SRC
-** Modeline
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package spaceline
-  ;;   :ensure t
-  ;;   :config
-  ;;   (require 'spaceline-config)
-  ;;   (setq powerline-default-separator (quote arrow)))
-
 #+END_SRC
 ** Org
 #+BEGIN_SRC emacs-lisp
