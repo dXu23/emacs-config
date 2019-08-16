@@ -1,7 +1,6 @@
 
 Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
-
 * config edit/reload
 ** edit
 #+BEGIN_SRC emacs-lisp
@@ -29,6 +28,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Prevent emacs from making backup files
 #+BEGIN_SRC emacs-lisp
 (setq make-backup-file nil)
+#+END_SRC
+** Get rid of lock mode.
+#+BEGIN_SRC emacs-lisp
+  (setq create-lockfiles nil)
 #+END_SRC
 ** Prevent emacs from auto-saving
 #+BEGIN_SRC emacs-lisp
@@ -163,7 +166,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 ;; (require 'org-checklist)
 #+END_SRC
-
 
 *** Set org-log-done to true
 #+BEGIN_SRC emacs-lisp
