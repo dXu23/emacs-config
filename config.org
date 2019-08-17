@@ -303,10 +303,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** package-list
 #+BEGIN_SRC emacs-lisp
   ;; <use-package>
+  ;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives
-	       '(("melpa" . "https://melpa.org/packages/")
+	       '(("melpa" . "http://melpa.org/packages/")
 		 ("gnu" . "https://elpa.gnu.org/packages/")
 		 ("org" . "http://orgmode.org/elpa/")))
 
@@ -357,8 +358,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Cider
     Package for clojure
 #+BEGIN_SRC emacs-lisp
-  (use-package cider
-    :ensure t)
+  ;; (use-package cider
+  ;;  :ensure t)
 #+END_SRC
 
 ** Company
@@ -420,42 +421,42 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 ** Exec-from-path-initialize
 #+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
-    )
+;;  (use-package exec-path-from-shell
+;;    :config
+;;    (when (memq window-system '(mac ns x))
+;;      (exec-path-from-shell-initialize))
+;;    )
 #+END_SRC
 
 ** Hydra
 #+BEGIN_SRC emacs-lisp
-    (use-package hydra
-      :config
-      (defhydra hydra-zoom (global-map "<f2>")
-	"zoom"
-	("g" text-scale-increase "in")
-	("l" text-scale-decrease "out"))
+  ;; (use-package hydra
+  ;;  :config
+  ;;  (defhydra hydra-zoom (global-map "<f2>")
+  ;;    "zoom"
+  ;;    ("g" text-scale-increase "in")
+  ;;    ("l" text-scale-decrease "out"))
 
-      (global-set-key
-       (kbd "C-n")
-       (defhydra hydra-move
-	 (:body-pre (next-line))
-	 "move"
-	 ("n" next-line)
-	 ("p" previous-line)
-	 ("f" forward-char)
-	 ("F" forward-word)
-	 ("b" backward-char)
-	 ("B" backward-word)
-	 ("a" move-beginning-of-line)
-	 ("A" backward-sentence)
-	 ("e" move-end-of-line)
-	 ("E" forward-sentence)
-	 ("v" scroll-up-command)
-	 ("V" scroll-down-command)
-	 ("l" recenter-top-bottom))
-       )
-      )
+  ;;  (global-set-key
+  ;;   (kbd "C-n")
+  ;;   (defhydra hydra-move
+  ;;     (:body-pre (next-line))
+  ;;     "move"
+  ;;     ("n" next-line)
+  ;;     ("p" previous-line)
+  ;;     ("f" forward-char)
+  ;;     ("F" forward-word)
+  ;;     ("b" backward-char)
+  ;;     ("B" backward-word)
+  ;;     ("a" move-beginning-of-line)
+  ;;     ("A" backward-sentence)
+  ;;     ("e" move-end-of-line)
+  ;;     ("E" forward-sentence)
+  ;;     ("v" scroll-up-command)
+  ;;     ("V" scroll-down-command)
+  ;;     ("l" recenter-top-bottom))
+  ;;   )
+  ;;  )
 
 
 #+END_SRC
@@ -467,7 +468,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 ** htmlize
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
+;;  (use-package htmlize)
 #+END_SRC
 
 ** Magit
@@ -500,7 +501,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Python mode
 #+BEGIN_SRC emacs-lisp
 
-  (use-package python-mode)
+  ;;  (use-package python-mode)
   ;;use-package 'python-mode
   ;; :config
   ;; (setq-default py-shell-name "ipython")

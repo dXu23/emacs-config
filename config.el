@@ -14,6 +14,8 @@
 
 (setq make-backup-file nil)
 
+(setq create-lockfiles nil)
+
 (setq auto-save-default nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -32,25 +34,24 @@
 (global-set-key "\M-Z" 'zap-up-to-char)
 
 (defun split-and-follow-horizontally ()
-  "Splits a window horizontally and follows to opened window"
-  (interactive)
-  (split-window-below)
-  (balance-windows)
-  (other-window 1)
-  )
+   "Splits a window horizontally and follows to opened window"
+   (interactive)
+   (split-window-below)
+   (balance-windows)
+   (other-window 1)
+   )
 
+
+
+ (defun split-and-follow-vertically ()
+   "Splits a window vertically and follows to opened window"
+   (interactive)
+   (split-window-right)
+   (balance-windows)
+   (other-window 1)
+   )
 (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
-
-
-(defun split-and-follow-vertically ()
-  "Splits a window vertically and follows to opened window"
-  (interactive)
-  (split-window-right)
-  (balance-windows)
-  (other-window 1)
-  )
-
-(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+ (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 
 (defun compile-based-on-extension (&optional args) 
     "Compile/run a file based on its extension"
@@ -181,10 +182,11 @@
    ))
 
 ;; <use-package>
+;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives
-	     '(("melpa" . "https://melpa.org/packages/")
+	     '(("melpa" . "http://melpa.org/packages/")
 	       ("gnu" . "https://elpa.gnu.org/packages/")
 	       ("org" . "http://orgmode.org/elpa/")))
 
@@ -226,8 +228,8 @@
   :init
   (beacon-mode 1))
 
-(use-package cider
-  :ensure t)
+;; (use-package cider
+;;  :ensure t)
 
 (use-package company
   :ensure t
@@ -278,56 +280,50 @@
   :after company
 )
 
-(use-package exec-path-from-shell
-  :config
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
-  )
+;;  (use-package exec-path-from-shell
+;;    :config
+;;    (when (memq window-system '(mac ns x))
+;;      (exec-path-from-shell-initialize))
+;;    )
 
-(use-package hydra
-  :config
-  (defhydra hydra-zoom (global-map "<f>")
-    "zoom"
-    ("g" text-scale-increase "in")
-    ("l" text-scale-decrease "out"))
+;; (use-package hydra
+;;  :config
+;;  (defhydra hydra-zoom (global-map "<f2>")
+;;    "zoom"
+;;    ("g" text-scale-increase "in")
+;;    ("l" text-scale-decrease "out"))
 
-  (global-set-key
-   (kbd "C-n")
-   (defhydra hydra-move
-     (:body-pre (next-line))
-     "move"
-     ("n" next-line)
-     ("p" previous-line)
-     ("f" forward-char)
-     ("F" forward-word)
-     ("b" backward-char)
-     ("B" backward-word)
-     ("a" move-beginning-of-line)
-     ("A" backward-sentence)
-     ("e" move-end-of-line)
-     ("E" forward-sentence)
-     ("v" scroll-up-command)
-     ("V" scroll-down-command)
-     ("l" recenter-top-bottom))
-   )
-  )
+;;  (global-set-key
+;;   (kbd "C-n")
+;;   (defhydra hydra-move
+;;     (:body-pre (next-line))
+;;     "move"
+;;     ("n" next-line)
+;;     ("p" previous-line)
+;;     ("f" forward-char)
+;;     ("F" forward-word)
+;;     ("b" backward-char)
+;;     ("B" backward-word)
+;;     ("a" move-beginning-of-line)
+;;     ("A" backward-sentence)
+;;     ("e" move-end-of-line)
+;;     ("E" forward-sentence)
+;;     ("v" scroll-up-command)
+;;     ("V" scroll-down-command)
+;;     ("l" recenter-top-bottom))
+;;   )
+;;  )
 
 (use-package ivy
   :ensure t)
 
-(use-package htmlize)
+;;  (use-package htmlize)
 
 (use-package magit
   :ensure t
   :bind
   ("C-x g" . magit-status)
   ("C-x M-g" . magit-dispatch))
-
-;; (use-package spaceline
-;;   :ensure t
-;;   :config
-;;   (require 'spaceline-config)
-;;   (setq powerline-default-separator (quote arrow)))
 
 (use-package org
   :ensure org-plus-contrib
@@ -340,7 +336,7 @@
 
 (require 'org-drill)
 
-(use-package python-mode)
+;;  (use-package python-mode)
 ;;use-package 'python-mode
 ;; :config
 ;; (setq-default py-shell-name "ipython")
