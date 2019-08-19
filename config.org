@@ -387,7 +387,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 	(interactive)
 	(let* ((k (this-command-keys))
 	     (re (concat "^" command-prefix k)))
-	(if (cl-find-if (lambda (s) (string-match re s))
+	(if (find-if (lambda (s) (string-match re s))
 			company-candidates)
 	    (self-insert-command 1)
 	  (company-complete-number (string-to-number k)))))
@@ -430,12 +430,12 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 ** Hydra
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package hydra
-  ;;  :config
-  ;;  (defhydra hydra-zoom (global-map "<f2>")
-  ;;    "zoom"
-  ;;    ("g" text-scale-increase "in")
-  ;;    ("l" text-scale-decrease "out"))
+  (use-package hydra
+   :config
+   (defhydra hydra-zoom (global-map "<f2>")
+     "zoom"
+     ("g" text-scale-increase "in")
+     ("l" text-scale-decrease "out")))
 
   ;;  (global-set-key
   ;;   (kbd "C-n")
@@ -480,13 +480,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
 #+END_SRC
-** Org
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
-    )
-
-#+END_SRC
 ** Org Bullets
  #+BEGIN_SRC emacs-lisp
    (use-package org-bullets
@@ -494,10 +487,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
      :config
      (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
  #+END_SRC
-** Additional org packages
-#+BEGIN_SRC emacs-lisp
-  (require 'org-drill)
-#+END_SRC
 ** Python mode
 #+BEGIN_SRC emacs-lisp
 
@@ -532,6 +521,17 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :bind ("C-s" . swiper-isearch))
 
 #+END_SRC
+** sbt-mode
+#+begin_src emacs-lisp
+  (use-package sbt-mode
+:commands sbt-start sbt-command
+:config
+;; WORKAROUND: allows using SPACE when in the minibuffer
+(substitute-key-definition
+'minibuffer-complete-word
+'self-insert-command
+minibuffer-local-completion-map))
+#+end_src
 ** switch-window
     Package to switch windows more quickly; Pressing C-x o now brings up a menu of keys
     corresponding to the window one wants to switch to

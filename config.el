@@ -325,16 +325,10 @@
   ("C-x g" . magit-status)
   ("C-x M-g" . magit-dispatch))
 
-(use-package org
-  :ensure org-plus-contrib
-  )
-
 (use-package org-bullets
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-
-(require 'org-drill)
 
 ;;  (use-package python-mode)
 ;;use-package 'python-mode
