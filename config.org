@@ -480,13 +480,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
 #+END_SRC
-** Org
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
-    )
-
-#+END_SRC
 ** Org Bullets
  #+BEGIN_SRC emacs-lisp
    (use-package org-bullets
@@ -494,10 +487,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
      :config
      (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
  #+END_SRC
-** Additional org packages
-#+BEGIN_SRC emacs-lisp
-  (require 'org-drill)
-#+END_SRC
 ** Python mode
 #+BEGIN_SRC emacs-lisp
 
