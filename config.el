@@ -177,6 +177,7 @@
    (C . t)
    (python . t)
    (R . t)
+   (ocaml . t)
    (ditaa . t)
    (gnuplot . t)
    ))
@@ -286,12 +287,13 @@
 ;;      (exec-path-from-shell-initialize))
 ;;    )
 
-;; (use-package hydra
-;;  :config
-;;  (defhydra hydra-zoom (global-map "<f2>")
-;;    "zoom"
-;;    ("g" text-scale-increase "in")
-;;    ("l" text-scale-decrease "out"))
+(use-package hydra
+  :config
+  (defhydra hydra-zoom (global-map "<f2>")
+    "zoom"
+    ("g" text-scale-increase "in")
+    ("l" text-scale-decrease "out"))
+  )
 
 ;;  (global-set-key
 ;;   (kbd "C-n")

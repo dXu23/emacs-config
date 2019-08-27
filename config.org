@@ -162,6 +162,14 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 (global-set-key "\C-cb" 'org-switchb)
 #+END_SRC
 
+*** Some tags
+#+BEGIN_SRC elisp
+  (setq org-tag-alist '(("@math330" . ?a)
+			("@cs494" . ?d)
+			("@cs476" . ?p)
+			("@cs421" . ?n))
+	)
+#+END_SRC
 *** Require org-drill
 #+BEGIN_SRC emacs-lisp
 ;; (require 'org-checklist)
@@ -294,6 +302,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 	(C . t)
 	(python . t)
 	(R . t)
+	(ocaml . t)
 	(ditaa . t)
 	(gnuplot . t)
 	))
@@ -430,12 +439,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 ** Hydra
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package hydra
-  ;;  :config
-  ;;  (defhydra hydra-zoom (global-map "<f2>")
-  ;;    "zoom"
-  ;;    ("g" text-scale-increase "in")
-  ;;    ("l" text-scale-decrease "out"))
+   (use-package hydra
+    :config
+    (defhydra hydra-zoom (global-map "<f2>")
+      "zoom"
+      ("g" text-scale-increase "in")
+      ("l" text-scale-decrease "out"))
+    )
 
   ;;  (global-set-key
   ;;   (kbd "C-n")
