@@ -162,24 +162,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 (global-set-key "\C-cb" 'org-switchb)
 #+END_SRC
 
-*** Some tags
-#+BEGIN_SRC elisp
-  (setq org-tag-alist '(("@math330" . ?a)
-			("@cs494" . ?d)
-			("@cs476" . ?p)
-			("@cs421" . ?n))
-	)
-#+END_SRC
-*** Require org-drill
-#+BEGIN_SRC emacs-lisp
-;; (require 'org-checklist)
-#+END_SRC
-
-*** Set org-log-done to true
-#+BEGIN_SRC emacs-lisp
-(setq org-log-done 'note)
-#+END_SRC
-
 *** Set org-mode agenda files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files '("~/gtd/inbox.org"
@@ -196,6 +178,29 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 
 *** Set colors for priorities
+*** Set ctr-a and ctrl-e for org-mode 
+#+BEGIN_SRC elisp
+(setq org-special-ctrl-a t)
+(setq org-special-ctrl-e t)
+#+END_SRC
+*** Some tags
+#+BEGIN_SRC elisp
+  (setq org-tag-alist '(("@math330" . ?a)
+			("@cs494" . ?d)
+			("@cs476" . ?p)
+			("@cs461" . ?o)
+			("@cs421" . ?n))
+	)
+#+END_SRC
+*** Require org-drill
+#+BEGIN_SRC emacs-lisp
+;; (require 'org-checklist)
+#+END_SRC
+*** Set org-log-done to true
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done 'note)
+#+END_SRC
+s
 #+BEGIN_SRC emacs-lisp
   (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
 			     (?B . (:foreground "#FFA500"))
@@ -430,11 +435,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 ** Exec-from-path-initialize
 #+BEGIN_SRC emacs-lisp
-;;  (use-package exec-path-from-shell
-;;    :config
-;;    (when (memq window-system '(mac ns x))
-;;      (exec-path-from-shell-initialize))
-;;    )
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+    )
 #+END_SRC
 
 ** Hydra

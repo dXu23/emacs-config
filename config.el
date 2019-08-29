@@ -107,10 +107,6 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-switchb)
 
-;; (require 'org-checklist)
-
-(setq org-log-done 'note)
-
 (setq org-agenda-files '("~/gtd/inbox.org"
 			 "~/gtd/gtd.org"
 			 "~/gtd/tickler.org"))
@@ -118,6 +114,10 @@
 (setq org-highest-priority ?A)
 (setq org-lowest-priority ?C)
 (setq org-default-priority ?A)
+
+;; (require 'org-checklist)
+
+(setq org-log-done 'note)
 
 (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
 			   (?B . (:foreground "#FFA500"))
@@ -281,11 +281,11 @@
   :after company
 )
 
-;;  (use-package exec-path-from-shell
-;;    :config
-;;    (when (memq window-system '(mac ns x))
-;;      (exec-path-from-shell-initialize))
-;;    )
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  )
 
 (use-package hydra
   :config
