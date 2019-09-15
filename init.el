@@ -1,3 +1,6 @@
+;;; Get common lisp:
+(require 'cl)
+
 ;;; Have outline mode in emacs-lisp:
 (add-hook 'emacs-lisp-mode-hook
 	  (lambda ()
@@ -13,14 +16,14 @@
 
   (defun config-visit ()
     (interactive)
-    (find-file "~/.emacs.d/config.org"))
+    (find-file "~/.emacs.d/init.el"))
   (global-set-key (kbd "C-c e") 'config-visit)
 
 ;; reload:
 
   (defun config-reload ()
     (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+    (load-file (expand-file-name "~/.emacs.d/init.el")))
   (global-set-key (kbd "C-c r") 'config-reload)
 
 ;;; 'Fixing' Emacs::
@@ -28,19 +31,15 @@
 (setq inhibit-startup-message t)
 
 ;; Prevent emacs from freezing when pressing 'C-x C-c':
-
 (setq x-select-enable-clipboard-manager nil)
 
 ;; Prevent emacs from making backup files:
-
 (setq make-backup-file nil)
 
-;; Get rid of lock mode.:
-
-  (setq create-lockfiles nil)
+;; Get rid of lock mode:
+(setq create-lockfiles nil)
 
 ;; Prevent emacs from auto-saving:
-
 (setq auto-save-default nil)
 
 ;; Make yes or no prompts as simple as typing 'y' or 'n':
@@ -336,29 +335,12 @@
 ;; avy:
 
   (use-package avy
-    :ensure t)
-
-  (defun avy-goto-char-n (&optional n arg beg end &rest chars)
-    (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
-	(let ((count 1)
-	     (charList '()))
-		 (while (<= count (prefix-numeric-value current-prefix-arg))
-		   (push (read-char (format "char %d: " count) t) charList)
-		   (setq count (1+ count))
-		   )
-		 (reverse charList))
-	       )
-    )
-
-    (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
-    (avy-with avy-goto-char-n
-      (avy-jump
-       (regexp-quote (concat chars))
-       :window-flip arg
-       :beg beg
-       :end end)))
-
-  (global-set-key (kbd "C-:") 'avy-goto-char-n)
+    :ensure t
+    :bind
+    ("C-;" . avy-goto-char)
+    ("C-'" . avy-goto-word-1)
+    :config
+    (setq avy-style 'words))
 
 
 ;; beacon:
@@ -441,36 +423,17 @@
       "zoom"
       ("g" text-scale-increase "in")
       ("l" text-scale-decrease "out"))
+    (defhydra hydra-avy-cycle ()
+      ("j" avy-next "next")
+      ("k" avy-prev "prev")
+      ("q" nil "quit"))
+    :bind
+    ("C-M-'" . hydra-avy-cycle/body)
     )
 
-  ;;  (global-set-key
-  ;;   (kbd "C-n")
-  ;;   (defhydra hydra-move
-  ;;     (:body-pre (next-line))
-  ;;     "move"
-  ;;     ("n" next-line)
-  ;;     ("p" previous-line)
-  ;;     ("f" forward-char)
-  ;;     ("F" forward-word)
-  ;;     ("b" backward-char)
-  ;;     ("B" backward-word)
-  ;;     ("a" move-beginning-of-line)
-  ;;     ("A" backward-sentence)
-  ;;     ("e" move-end-of-line)
-  ;;     ("E" forward-sentence)
-  ;;     ("v" scroll-up-command)
-  ;;     ("V" scroll-down-command)
-  ;;     ("l" recenter-top-bottom))
-  ;;   )
-  ;;  )
-
-
-
 ;; Ivy:
-
   (use-package ivy
     :ensure t)
-
 
 ;; htmlize:
 
@@ -478,7 +441,6 @@
 
 
 ;; Magit:
-
 
   (use-package magit
     :ensure t
@@ -692,8 +654,6 @@
   (ad-activate 'ansi-term)
 
 
-
-
 (setq scroll-conservatively 100)
 
 (setq ring-bell-function 'ignore)
@@ -711,7 +671,7 @@
  '(jdee-server-dir "~/jdee-server/target/")
  '(package-selected-packages
    (quote
-    (exec-path-from-shell merlin ocp-indent tuareg org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
+    (counsel slack exec-path-from-shell merlin ocp-indent tuareg org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
