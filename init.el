@@ -1,76 +1,89 @@
-;;; Get common lisp:
-(require 'cl)
 
-;;; Have outline mode in emacs-lisp:
+
+
+;;;* Have outline mode in emacs-lisp:
 (add-hook 'emacs-lisp-mode-hook
 	  (lambda ()
 	    (make-local-variable 'outline-regexp)
-	    (setq outline-regexp "^;;; ")
+	    (setq outline-regexp ";;;\\*+\\|\\`")
 	    (make-local-variable 'outline-heading-end-regexp)
 	    (setq outline-heading-end-regexp ":\n")
 	    (outline-minor-mode 1)
 	    ))
 
-;;; config edit/reload:
-;; edit:
+
+;;;* Display agenda on startup
+(add-hook 'after-init-hook 'org-agenda-list)
+
+;;;* Set up recent files
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(setq recentf-max-saved-items 25)
+(global-set-key "\C-x\C-r" 'recentf-open-files)
+
+;;;* config edit/reload:
+;;;** edit:
 
   (defun config-visit ()
     (interactive)
     (find-file "~/.emacs.d/init.el"))
   (global-set-key (kbd "C-c e") 'config-visit)
 
-;; reload:
+;;;** reload:
 
   (defun config-reload ()
     (interactive)
     (load-file (expand-file-name "~/.emacs.d/init.el")))
   (global-set-key (kbd "C-c r") 'config-reload)
 
-;;; 'Fixing' Emacs::
-;; Set emacs so that scratch buffer shows up instead of help screen:
+;;;* 'Fixing' Emacs::
+;;;** Set emacs so that scratch buffer shows up instead of help screen:
+(setq initial-scratch-message "")
 (setq inhibit-startup-message t)
 
-;; Prevent emacs from freezing when pressing 'C-x C-c':
+(setq visible-bell t)
+
+;;;** Prevent emacs from freezing when pressing 'C-x C-c':
 (setq x-select-enable-clipboard-manager nil)
 
-;; Prevent emacs from making backup files:
+;;;**Prevent emacs from making backup files:
 (setq make-backup-file nil)
 
-;; Get rid of lock mode:
+;;;**Get rid of lock mode:
 (setq create-lockfiles nil)
 
-;; Prevent emacs from auto-saving:
+;;;**Prevent emacs from auto-saving:
 (setq auto-save-default nil)
 
-;; Make yes or no prompts as simple as typing 'y' or 'n':
+;;;**Make yes or no prompts as simple as typing 'y' or 'n':
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;; Adding '/usr/local/bin' to exec-path:
+;;;**Adding '/usr/local/bin' to exec-path:
 
-  (add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/usr/local/bin")
 
-;; Set default tramp method to ssh:
+;;;**Set default tramp method to ssh:
   (setq tramp-default-method "ssh")
 
-;; Use newlines  as a separator when appending and prepending to registers:
+;;;**Use newlines  as a separator when appending and prepending to registers:
   (setq register-separator ?+)
   (set-register register-separator "\n\n")
 
 
-;; utf-8:
+;;;**utf-8:
   (prefer-coding-system 'utf-8)
 
-;; Relative line numbers:
+;;;**Relative line numbers:
   (setq display-line-numbers 'relative)
 
 
-;;; Some preferred keybindings::
-;; Set 'M-S-z' to zap-up-to-char:
+;;;* Some preferred keybindings:
+;;;** Set 'M-S-z' to zap-up-to-char:
 
   (global-set-key "\M-Z" 'zap-up-to-char)
 
-;; Split and follow function:
+;;;** Split and follow function:
 
   (defun split-and-follow-horizontally ()
     "Splits a window horizontally and follows to opened window"
@@ -80,7 +93,6 @@
     (other-window 1)
     )
 
-  
 
   (defun split-and-follow-vertically ()
     "Splits a window vertically and follows to opened window"
@@ -90,33 +102,16 @@
     (other-window 1)
     )
  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
-  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
-
-;; Making compiling easier:
-
-  (defun compile-based-on-extension (&optional args) 
-      "Compile/run a file based on its extension"
-      (interactive "P")
-      (setq file-extension (file-name-extension buffer-file-name))
-      (setq executable-name (file-name-base buffer-file-name))
-      (cond ((string= file-extension "c")
-	    (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	    ((string= file-extension "cpp")
-	     (compile (concat "g++ -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	    ((string= file-extension "java")
-	    (compile (concat "javac " buffer-file-name " && java " executable-name)))
-      )
-  )
-
-  (defun my-compile ()
-    (interactive)
-    (let ((default-directory (locate-dominating-file "." "Makefile")))
-      (compile "make")))
+ (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 
 
+(defun other-window-backward (&optional n)
+  "Select Nth previous window."
+  (interactive "P")
+  (other-window (- (prefix-numeric-window n))))
 
-;; Insert date and time easily:
 
+;;;* Insert date and time easily:
   (defun mp-insert-date ()
     (interactive)
     (insert (format-time-string "%x")))
@@ -128,7 +123,7 @@
   (global-set-key (kbd "C-c i d") 'mp-insert-date)
   (global-set-key (kbd "C-c i t") 'mp-insert-time)
 
-;; Copy rectangle region:
+;;;* Copy rectangle region:
 
    (defun my-copy-rectangle (start end)
      "Copy the region-rectangle instead of `kill-rectangle'."
@@ -136,9 +131,10 @@
      (delete-rectangle start end)
      (setq killed-rectangle (extract-rectangle start end)))
 
-  (global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
+(global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 
-;;; Preinstalled packages::
+
+;;;* Preinstalled packages::
 ;; ido-mode:
 
   (setq ido-enable-flex-matching t)
@@ -155,7 +151,7 @@
   (global-whitespace-mode t)
 
 ;; Org:
-;;; Org-mode keybindings::
+;;;* Org-mode keybindings::
 
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -163,48 +159,38 @@
 (global-set-key "\C-cb" 'org-switchb)
 
 
-;;; Set org-mode agenda files::
+;;;* Set org-mode agenda files::
+;; Going to take a break from using org-mode to organize stuff
+;;  (setq org-agenda-files '("~/gtd/inbox.org"
+;;			   "~/gtd/gtd.org"
+;;			   "~/gtd/tickler.org"))
 
-  (setq org-agenda-files '("~/gtd/inbox.org"
-			   "~/gtd/gtd.org"
-			   "~/gtd/tickler.org"))
 
 
-
-;;; Set priority range from A to C with default A::
+;;;* Set priority range from A to C with default A::
 
   (setq org-highest-priority ?A)
   (setq org-lowest-priority ?C)
   (setq org-default-priority ?A)
 
 
-;;; Set colors for priorities::
-;;; Set ctr-a and ctrl-e for org-mode ::
+;;;* Set colors for priorities::
+;;;* Set ctr-a and ctrl-e for org-mode ::
 
 (setq org-special-ctrl-a t)
 (setq org-special-ctrl-e t)
 
-;;; Some tags::
-  (setq org-tag-alist '(("@math330" . ?a)
-			("@cs494" . ?d)
-			("@cs476" . ?p)
-			("@cs461" . ?o)
-			("@cs421" . ?n))
-	)
 
-
-;;; Set org-log-done to true::
+;;;* Set org-log-done to true::
 
 (setq org-log-done 'note)
-
-
 
   (setq org-priority-faces '((?A . (:foreground "#DC143C" :weight bold))
 			     (?B . (:foreground "#FFA500"))
 			     (?C . (:foreground "#48D1CC"))))
 
 
-;;; Org-mode templates::
+;;;* Org-mode templates::
 
   (setq org-capture-templates '(("t" "Todo [inbox]" entry
 				 (file+headline "~/gtd/inbox.org" "Tasks")
@@ -213,41 +199,52 @@
 				 (file+headline "~/gtd/tickler.org" "Tickler")
 				 "* %i%? \n %U")))
 
-;;; Hide emphasis markers::
+;;;* 
+;;;* Hide emphasis markers::
 
 (setq org-hide-emphasis-markers t)
 
-;;; open agenda in current window::
+;;;* Set header-line::
+(setq header-line-format " ")
+
+;;;* open agenda in current window::
   (setq org-agenda-window-setup (quote current-window))
 
 
-;;; Warn about any deadline in next 7 days::
+;;;* Warn about any deadline in next 7 days::
 
   (setq org-deadline-warning-days 7)
 
 
-;;; Show tasks scheduled/due in next fortnight::
+;;;* Show tasks scheduled/due in next fortnight::
 
   (setq org-agenda-span (quote fortnight))
 
 
-;;; Do not show tasks as scheduled if already shown as deadline::
+;;;* Do not show tasks as scheduled if already shown as deadline::
 
   (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 
 
-;;; Do not give warning colors to tasks w/ impending deadlines::
+;;;* Do not give warning colors to tasks w/ impending deadlines::
 
   (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
 
 
-;;; Do not show tasks that are scheduled or have deadlines in normal todo list::
+;;;* Do not show tasks that are scheduled or have deadlines in normal todo list::
 
   (setq org-agenda-todo-ignore-deadlines (quote all))
-  (setq org-agenda-todo-ignore-scheduled (quote all))
+(setq org-agenda-todo-ignore-scheduled (quote all))
 
+;; Org timer
 
-;;; How tasks should be sorted::
+(setq org-timer-default-timer 25)
+
+(add-hook 'org-clock-in-hook (lambda ()
+			       (if (not org-timer-current-timer)
+				   (org-timer-set-timer '(16)))))
+
+;;;* How tasks should be sorted::
   (setq org-agenda-sorting-strategy
 	(quote
 	 ((agenda deadline-up priority-down)
@@ -256,47 +253,47 @@
 	  (search category-keep))))
 
 
-;;; org-refile targets::
+;;;* org-refile targets::
 
-  (setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
-			     ("~/gtd/someday.org" :level . 1)
-			     ("~/gtd/tickler.org" :maxlevel . 2)))
+;; (setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+;;			     ("~/gtd/someday.org" :level . 1)
+;;			     ("~/gtd/tickler.org" :maxlevel . 2)))
 
-;;; org-mode todo keywords::
+;;;* org-mode todo keywords::
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
 
-;;; Turn off org-goto-auto-isearch::
+;;;* Turn off org-goto-auto-isearch::
 
   (setq org-goto-auto-isearch nil)
 
 
-;;; Set org-indent to 2::
+;;;* Set org-indent to 2::
   (setq org-list-indent-offset 2)
 
-;;; Save clock history across emacs sessions::
+;;;* Save clock history across emacs sessions::
 
   (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
 
 
-;;; Syntax highlight text in block::
+;;;* Syntax highlight text in block::
 
   (setq org-src-fontify-natively t)
 
-;;; Maximum indentation for description lists::
+;;;* Maximum indentation for description lists::
 
   (setq org-list-description-max-indent 5)
 
-;;; prevent demoting heading::
+;;;* prevent demoting heading::
 
   (setq org-adapt-indentation nil)
 
 
 
-;;; Have org-mode support programming languages::
+;;;* Have org-mode support programming languages::
    
      (org-babel-do-load-languages
       'org-babel-load-languages
@@ -307,52 +304,58 @@
 	(R . t)
 	(ocaml . t)
 	(ditaa . t)
+	(dot . t)
 	(gnuplot . t)
 	))
-   
 
-;;; Extra Packages::
+
+;;;* Migrate to straight.el:
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+
+;;;* Extra Packages::
 ;; package-list:
 
-  ;; <use-package>
-  ;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (setq package-archives
-	       '(("melpa" . "http://melpa.org/packages/")
-		 ("gnu" . "https://elpa.gnu.org/packages/")
-		 ("org" . "http://orgmode.org/elpa/")))
-
-  (package-initialize)
-
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-  (require 'use-package)
   ;; </use-package
+;;;;  package.el
+;;; Minimal package.el
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
 
 
 ;; avy:
 
   (use-package avy
-    :ensure t
     :bind
     ("C-;" . avy-goto-char)
-    ("C-'" . avy-goto-word-1)
+    ("C-=" . avy-goto-word-1)
     :config
     (setq avy-style 'words))
 
 
 ;; beacon:
 (use-package beacon
-  :ensure t
   :init
   (beacon-mode 1))
 
 ;; Company:
 
     (use-package company
-      :ensure t
       :config
       (setq company-idle-delay 0.5)
       (setq company-show-numbers t)
@@ -389,7 +392,7 @@
 ;; Company-irony:
 
   (use-package company-irony
-    :ensure t
+
     :after company
     :config
     (add-to-list 'company-backends 'company-irony)
@@ -424,16 +427,25 @@
       ("g" text-scale-increase "in")
       ("l" text-scale-decrease "out"))
     (defhydra hydra-avy-cycle ()
-      ("j" avy-next "next")
-      ("k" avy-prev "prev")
+      ("n" avy-next "next")
+      ("p" avy-prev "prev")
       ("q" nil "quit"))
     :bind
     ("C-M-'" . hydra-avy-cycle/body)
     )
 
+(use-package counsel)
+
 ;; Ivy:
-  (use-package ivy
-    :ensure t)
+(use-package ivy
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  :bind
+  :init
+  (ivy-mode 1)
+  )
+
 
 ;; htmlize:
 
@@ -443,18 +455,17 @@
 ;; Magit:
 
   (use-package magit
-    :ensure t
     :bind
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
 
 ;; Org Bullets:
- 
+
    (use-package org-bullets
-     :ensure t
-     :config
-     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
- 
+     :hook
+     (prog-mode (org-mode . org-bullets-mode))
+     )
+
 ;; Python mode:
 
 
@@ -477,7 +488,6 @@
 ;; rainbow:
 
   ;; (use-package rainbow-mode
-  ;;  :ensure t
   ;;  :init (rainbow-mode 1))
 
 
@@ -485,15 +495,15 @@
 ;; Swiper:
 
   (use-package swiper
-    :ensure t
-    :bind ("C-s" . swiper-isearch))
+    :bind ("C-s" . swiper-isearch)
+    ("C-r" . swiper-isearch-backward))
+
 
 
 ;; switch-window:
 
 
   (use-package switch-window
-    :ensure t
     :config
     (setq switch-window-input-style 'minibuffer)
     (setq switch-window-increase 4)
@@ -509,7 +519,6 @@
 ;; popup-kill-ring:
 
   (use-package popup-kill-ring
-    :ensure t
     :bind ("M-y" . popup-kill-ring)
     :config
     (setq save-interprogram-paste-before-kill t))
@@ -519,51 +528,38 @@
 ;; which-key:
 
 (use-package which-key
-  :ensure t
   :init
   (which-key-mode))
 
 
-;; 4clojure:
-
-  (use-package 4clojure
-    :ensure t)
-
 ;; Yasnippet:
 
   (use-package yasnippet
-    :ensure t
     :config
-    (use-package yasnippet-snippets
-      :ensure t)
+    (use-package yasnippet-snippets)
     (yas-reload-all)
     (yas-global-mode 1))
 
 
-;;; Aesthetic Changes::
+;;;* Aesthetic Changes::
 ;; Change default tab-with to 4 spaces:
 
   (setq default-tab-width 4)
 
 ;; Getting rid of all bars:
-;;; Tool bar::
 
-(tool-bar-mode -1)
-
-
-;;; Menu bar::
-
-(menu-bar-mode -1)
+(tool-bar-mode 0)
+(menu-bar-mode 0)
 
 
-;;; Scroll bar::
+;;;* Scroll bar::
 
-(scroll-bar-mode -1)
+(scroll-bar-mode 0)
 
 ;; Change modeline:
 
   (column-number-mode 1)
-  (set-face-attribute 'mode-line nil :background "light blue")
+  (set-face-attribute 'mode-line nil :background "light green")
   (set-face-attribute 'mode-line-buffer-id nil :background "blue" :foreground)
   (defface mode-line-directory
     '((t : background "blue" :foreground "gray"))
@@ -619,33 +615,31 @@
 		  mode-line-misc-info
 		  mode-line-end-spaces))
 
-;;; Highlight current line::
+;;;* Highlight current line::
 
 (when window-system (global-hl-line-mode t))
 
-;;; Prettify symbols::
+;;;* Prettify symbols::
 
 (when window-system (global-prettify-symbols-mode t))
 
-;;; Set font to M+ 1mn::
+;;;* Set font to M+ 1mn::
 
   (set-frame-font "M+ 1mn")
 
-;;; Make emacs theme moe::
+;;;* Set emacs theme to simple grey on black::
 
-(unless (package-installed-p 'moe-theme)
-  (package-refresh-contents)
-  (package-install 'moe-theme))
+(custom-set-faces
+ '(default ((t (:background "black" :foreground "grey"))))
+ '(fringe ((t (:background "black")))))
+	      
 
-(require 'moe-theme)
-(moe-light)
-
-;;; Language-Specific Settings::
+;;;* Language-Specific Settings::
 ;; C:
 
   (setq-default c-basic-offset 4)
 
-;;; Terminal::
+;;;* Terminal::
 ;; Setting default shell to bash:
 
   (defvar my-term-shell "/bin/bash")
@@ -657,21 +651,6 @@
 (setq scroll-conservatively 100)
 
 (setq ring-bell-function 'ignore)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(column-number-mode t)
- '(jdee-jdk-registry
-   (quote
-    (("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
-     ("1.8.0_192" . "/usr/lib64/jvm/java-11-openjdk"))))
- '(jdee-server-dir "~/jdee-server/target/")
- '(package-selected-packages
-   (quote
-    (counsel slack exec-path-from-shell merlin ocp-indent tuareg org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
