@@ -134,6 +134,9 @@
 (global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 
 
+;;;* Set C-x C-b to ibuffer
+(global-set-key "\C-x\C-b" 'ibuffer)
+
 ;;;* Preinstalled packages::
 ;; ido-mode:
 
@@ -161,9 +164,9 @@
 
 ;;;* Set org-mode agenda files::
 ;; Going to take a break from using org-mode to organize stuff
-;;  (setq org-agenda-files '("~/gtd/inbox.org"
-;;			   "~/gtd/gtd.org"
-;;			   "~/gtd/tickler.org"))
+(setq org-agenda-files '("~/gtd/inbox.org"
+			   "~/gtd/gtd.org"
+			   "~/gtd/tickler.org"))
 
 
 
@@ -343,7 +346,7 @@
   (use-package avy
     :bind
     ("C-;" . avy-goto-char)
-    ("C-=" . avy-goto-word-1)
+    ("M-g w" . avy-goto-word-1)
     :config
     (setq avy-style 'words))
 
@@ -355,44 +358,51 @@
 
 ;; Company:
 
-    (use-package company
-      :config
-      (setq company-idle-delay 0.5)
-      (setq company-show-numbers t)
-      (setq company-minimum-prefix-length 3)
-      :bind (:map company-active-map
-		  ("M-n" . nil)
-		  ("M-p" . nil)
-		  ("C-n" . company-select-next)
-		  ("C-p" . company-select-previous)
-		  ("SPC" . company-abort)
-		  )
-      )
+(use-package company
+     :config
+     (setq company-idle-delay 0.5)
+     (setq company-show-numbers t)
+     (setq company-minimum-prefix-length 3)
 
-      (defun ora-company-number ()
-	"Forward to `company-complete-number'. 
 
-	 Unless the number is potentially part of the candidate.
-	 In that case, insert the number"
-	(interactive)
-	(let* ((k (this-command-keys))
-	     (re (concat "^" command-prefix k)))
-	(if (cl-find-if (lambda (s) (string-match re s))
-			company-candidates)
-	    (self-insert-command 1)
-	  (company-complete-number (string-to-number k)))))
+     :bind (:map company-active-map
+		   ("M-n" . nil)
+		   ("M-p" . nil)
+		   ("C-n" . company-select-next)
+		   ("C-p" . company-select-previous)
+		   ("SPC" . company-abort)
+		   )
+     )
 
-    ;;(mapc (lambda (x) (define-key company-active-map
-    ;;		   (format "%d" x)
-    ;;		   'ora-company-number))
-    ;;	  (number-sequence 0 9))
-
+;; (use-package epc)
+;;     (defun ora-company-number ()
+;;	 "Forward to `company-complete-number'. 
+;;
+;;	 Unless the number is potentially part of the candidate.
+;;	 In that case, insert the number"
+;;	 (interactive)
+;;	 (let* ((k (this-command-keys))
+;;	      (re (concat "^" command-prefix k)))
+;;	 (if (cl-find-if (lambda (s) (string-match re s))
+;;			 company-candidates)
+;;	     (self-insert-command 1)
+;;	   (company-complete-number (string-to-number k)))))
+;;
+;;(let ((map company-active-map))
+;;  (mapc (lambda (x) (define-key company-active-map
+;;		     (format "%d" x)
+;;		     'ora-company-number))
+;;	  (number-sequence 0 9))
+;;  (define-key map " " (lambda ()
+;;			  (interactive)
+;;			  (company-abort)
+;;			  (self-insert-command 1)))
+;;  (define-key map (kbd "<return>" nil) nil))
 
 
 ;; Company-irony:
 
   (use-package company-irony
-
     :after company
     :config
     (add-to-list 'company-backends 'company-irony)
@@ -434,7 +444,16 @@
     ("C-M-'" . hydra-avy-cycle/body)
     )
 
-(use-package counsel)
+(use-package counsel
+  :bind (:map minibuffer-local-map
+	      ("C-r" . counsel-minibuffer-history)
+         :map shell-mode-map
+	 ("C-r" . counsel-shell-history))
+  :init
+  (setq counsel-git-cmd "rg --files")
+  (setq counsel-rg-base-command
+	"rg -i M 120 --no-heading --line-number --color never %s")
+)
 
 ;; Ivy:
 (use-package ivy
@@ -461,29 +480,44 @@
 
 ;; Org Bullets:
 
-   (use-package org-bullets
-     :hook
-     (prog-mode (org-mode . org-bullets-mode))
-     )
+;;   (use-package org-bullets
+;;   :hook
+;;     (org-mode . org-bullets-mode)
+;;     )
 
 ;; Python mode:
 
 
-  ;;  (use-package python-mode)
-  ;;use-package 'python-mode
-  ;; :config
-  ;; (setq-default py-shell-name "ipython")
-  ;; (setq-default py-which-bufname "IPython")
-  ;;
-  ;; (setq py-force-py-shell-name-p t)
-  ;;
-  ;; (setq py-shell-switch-buffers-on-execute-p t)
-  ;; (setq py-switch-buffers-on-execute-p t)
-  ;;
-  ;; (setq py-split-windows-on-execute-p nil)
-  ;;
-  ;; (setq py-smart-indentation t)
-  ;;
+;;  Python-mode
+  (use-package python-mode
+   :config
+   (setq-default py-shell-name "ipython")
+   (setq-default py-which-bufname "IPython")
+   (setq py-force-py-shell-name-p t)
+   (setq py-shell-switch-buffers-on-execute-p t)
+   (setq py-switch-buffers-on-execute-p t)
+   (setq py-split-windows-on-execute-p nil)
+   (setq py-smart-indentation t)
+   )
+  
+
+;; Pdf-tools
+(use-package pdf-tools
+  :config
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-annot-activate-annotations t)
+  (setq pdf-view-resize-factor 1.1)
+  (pdf-tools-install)
+  :bind (:map pdf-view-mode-map
+	      ("C-s" . isearch-forward)
+	      ("h" . pdf-annot-add-highlight-markup-annotation)
+	      ("t" . pdf-annot-add-text-annotation)
+	      ("D" . pdf-annot-delete)
+	 )
+  :hook
+  (pdf-view . (lambda () (cua-mode 0)))
+  :magic ("%PDF" . pdf-view-mode)
+  )
 
 ;; rainbow:
 
