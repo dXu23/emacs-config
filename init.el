@@ -342,13 +342,20 @@
 
 
 ;; avy:
-
   (use-package avy
     :bind
     ("C-;" . avy-goto-char)
     ("M-g w" . avy-goto-word-1)
     :config
     (setq avy-style 'words))
+
+;; auctex
+(use-package auctex
+  :defer t
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil))
 
 
 ;; beacon:
@@ -472,20 +479,16 @@
 
 
 ;; Magit:
-
   (use-package magit
     :bind
     ("C-x g" . magit-status)
     ("C-x M-g" . magit-dispatch))
 
+
 ;; Org Bullets:
-
-;;   (use-package org-bullets
-;;   :hook
-;;     (org-mode . org-bullets-mode)
-;;     )
-
-;; Python mode:
+(use-package org-bullets
+  :hook (org-mode . (lambda () (org-bullets-mode 1)))
+  )
 
 
 ;;  Python-mode
@@ -498,8 +501,8 @@
    (setq py-switch-buffers-on-execute-p t)
    (setq py-split-windows-on-execute-p nil)
    (setq py-smart-indentation t)
-   )
-  
+ )
+
 
 ;; Pdf-tools
 (use-package pdf-tools
@@ -562,8 +565,10 @@
 ;; which-key:
 
 (use-package which-key
-  :init
-  (which-key-mode))
+  :config
+  (which-key-mode)
+  (which-key-setup-side-window-right-bottom)
+  )
 
 
 ;; Yasnippet:
@@ -659,7 +664,7 @@
 
 ;;;* Set font to M+ 1mn::
 
-  (set-frame-font "M+ 1mn")
+  (set-frame-font "deja vu sans mono")
 
 ;;;* Set emacs theme to simple grey on black::
 
@@ -695,3 +700,5 @@
  ;; If there is more than one, they won't work right.
  )
 (put 'narrow-to-region 'disabled nil)
+
+(add-to-list 'Info-directory-list "/usr/share/info")
