@@ -1,6 +1,3 @@
-
-
-
 ;;;* Have outline mode in emacs-lisp:
 (add-hook 'emacs-lisp-mode-hook
 	  (lambda ()
@@ -123,17 +120,6 @@
   (global-set-key (kbd "C-c i d") 'mp-insert-date)
   (global-set-key (kbd "C-c i t") 'mp-insert-time)
 
-;;;* Copy rectangle region:
-
-   (defun my-copy-rectangle (start end)
-     "Copy the region-rectangle instead of `kill-rectangle'."
-     (interactive "r")
-     (delete-rectangle start end)
-     (setq killed-rectangle (extract-rectangle start end)))
-
-(global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
-
-
 ;;;* Set C-x C-b to ibuffer
 (global-set-key "\C-x\C-b" 'ibuffer)
 
@@ -154,6 +140,11 @@
   (global-whitespace-mode t)
 
 ;; Org:
+
+;;;* Automatic tangle on save
+;; (org-mode . (lambda () (add-hook 'after-save-hook 'org-babel-tangle
+;;			    'run-at-end 'only-in-org-mode)))
+
 ;;;* Org-mode keybindings::
 
 (global-set-key "\C-cl" 'org-store-link)
@@ -297,11 +288,13 @@
 
 
 ;;;* Have org-mode support programming languages::
-   
+(require 'ob-js)
+
      (org-babel-do-load-languages
       'org-babel-load-languages
       '(
 	(shell . t)
+	(js . t)
 	(C . t)
 	(python . t)
 	(R . t)
@@ -344,6 +337,7 @@
 ;; avy:
   (use-package avy
     :bind
+    ("M-g g" . avy-goto-line)
     ("C-;" . avy-goto-char)
     ("M-g w" . avy-goto-word-1)
     :config
@@ -452,10 +446,15 @@
     )
 
 (use-package counsel
-  :bind (:map minibuffer-local-map
-	      ("C-r" . counsel-minibuffer-history)
-         :map shell-mode-map
-	 ("C-r" . counsel-shell-history))
+  :bind (("C-x C-f" . counsel-find-file)
+	 ("M-y" . counsel-yank-pop)
+	 ("C-h f" . counsel-describe-function)
+	 ("C-h v" . counsel-describe-variable)
+	 ("M-x" . counsel-M-x)
+  :map minibuffer-local-map
+	("C-r" . counsel-minibuffer-history)
+  :map shell-mode-map
+	("C-r" . counsel-shell-history))
   :init
   (setq counsel-git-cmd "rg --files")
   (setq counsel-rg-base-command
@@ -513,6 +512,7 @@
   (pdf-tools-install)
   :bind (:map pdf-view-mode-map
 	      ("C-s" . isearch-forward)
+	      ("C-r" . isearch-backward)
 	      ("h" . pdf-annot-add-highlight-markup-annotation)
 	      ("t" . pdf-annot-add-text-annotation)
 	      ("D" . pdf-annot-delete)
@@ -521,6 +521,15 @@
   (pdf-view . (lambda () (cua-mode 0)))
   :magic ("%PDF" . pdf-view-mode)
   )
+
+(defun kill-buffer-hook-setup ()
+  (if (and buffer-file-name
+	   (file-name-extension buffer-file-name)
+	   (string= (downcase (file-name-extension buffer-file-name)) "pdf")
+	   (yes-or-no-p "Set bookmark with current file name?"))
+      (bookmar-set (file-name-nondirectory buffer-file-name) nil)))
+
+(add-hook 'kill-buffer-hook 'kill-buffer-hook-setup)
 
 ;; rainbow:
 
@@ -539,7 +548,6 @@
 
 ;; switch-window:
 
-
   (use-package switch-window
     :config
     (setq switch-window-input-style 'minibuffer)
@@ -551,15 +559,7 @@
     :bind
     ([remap other-window] . switch-window))
 
-
-
-;; popup-kill-ring:
-
-  (use-package popup-kill-ring
-    :bind ("M-y" . popup-kill-ring)
-    :config
-    (setq save-interprogram-paste-before-kill t))
-
+(setq save-interprogram-paste-before-kill t)
 
 
 ;; which-key:
@@ -662,9 +662,9 @@
 
 (when window-system (global-prettify-symbols-mode t))
 
-;;;* Set font to M+ 1mn::
+;;;* Set font to Deja Vu::
 
-  (set-frame-font "deja vu sans mono")
+  (set-frame-font "-M+  -M+ 1m-normal-normal-normal-*-17-*-*-*-d-0-iso10646-1")
 
 ;;;* Set emacs theme to simple grey on black::
 
@@ -676,7 +676,38 @@
 ;;;* Language-Specific Settings::
 ;; C:
 
-  (setq-default c-basic-offset 4)
+(setq-default c-basic-offset 4)
+
+(add-hook 'c-mode-hook
+   (lambda ()
+  (unless (or (file-exists-p "makefile")
+              (file-exists-p "Makefile"))
+    (set (make-local-variable 'compile-command)
+         (concat "make -k "
+                 (if buffer-file-name
+                   (shell-quote-argument
+		    (file-name-sans-extension buffer-file-name))))))))
+
+
+;; Bison/Flex/Yacc
+(use-package bison-mode)
+
+(add-hook 'bison-mook-hook
+	  (lambda ()
+	    (unless (or (file-exists-p "makefile")
+			(file-exists-p "Makefile"))
+	      (set (make-local-variable 'compile-command)
+		   (concat "make -k "
+			   (if buffer-file-name
+			       (shell-quote-argument
+				(file-name-sans-extension buffer-file-name)
+				)
+			     )
+			   )
+		   )
+	      )
+	    )
+	  )
 
 ;;;* Terminal::
 ;; Setting default shell to bash:
@@ -702,3 +733,27 @@
 (put 'narrow-to-region 'disabled nil)
 
 (add-to-list 'Info-directory-list "/usr/share/info")
+
+(setq TeX-view-program-selection '(((output-dvi has-no-display-manager) "dvi2tty")
+ ((output-dvi style-pstricks)
+  "dvips and gv")
+ (output-dvi "xdvi")
+ (output-pdf "PDF Tools")
+ (output-html "xdg-open")))
+(setq TeX-source-correlate-start-server t)
+
+;; Update PDF buffers after successful LaTeX runs
+(add-hook 'TeX-after-compilation-finished-functions
+	  #'TeX-revert-document-buffer)
+
+
+
+(put 'downcase-region 'disabled nil)
+
+(defun highlight-char-pos (pos-list)
+  " Given a list of buffer positions, highlight the characters at those positions" 
+  (dolist (pos pos-list)
+    (goto-char pos)
+    (overlay-put (make-overlay pos (+ 1 pos)) 'face 'highlight)
+    )
+  )
