@@ -463,7 +463,9 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-    :ensure t)
+    :ensure t
+    :bind
+    ("C-x b" . ivy-switch-buffer))
 #+END_SRC
 
 ** htmlize
