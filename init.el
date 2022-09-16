@@ -1,4 +1,5 @@
 
+
 ;; Load settings from org mode file
 (require 'org)
 (setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
@@ -44,10 +45,10 @@
  '(lsp-rust-analyzer-cargo-watch-command "clippy" t)
  '(lsp-rust-analyzer-server-display-inlay-hints t t)
  '(package-selected-packages
-   '(crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
+   '(crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
  '(py-force-py-shell-name-p t)
+ '(py-python-command "ipython")
  '(py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
- '(py-shell-name "ipython")
  '(py-smart-indentation t)
  '(py-split-windows-on-execute-p nil t)
  '(py-switch-buffers-on-execute-p t))

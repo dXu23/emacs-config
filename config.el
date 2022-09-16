@@ -1,3 +1,21 @@
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("melpa"        . "https://melpa.org/packages/")
+			 ("melpa-stable" . "https://stable.melpa.org/packages/")
+			 ("gnu"          . "https://elpa.gnu.org/packages/")
+			 ("nongnu"       . "https://elpa.nongnu.org/nongnu/")))
+
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-and-compile
+(setq use-package-always-ensure t
+      use-package-expand-minimally t))
+
+(require 'use-package)
+
 (defun config-visit ()
   (interactive)
   (find-file "~/.emacs.d/config.org"))
@@ -9,6 +27,8 @@
 (global-set-key (kbd "C-c r") 'config-reload)
 
 (setq inhibit-startup-message t)
+
+(setq make-backup-file nil)
 
 (setq create-lockfiles nil)
 
@@ -150,12 +170,12 @@
 
 (use-package ob-python
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands (org-babel-execute:python))
 
 (use-package ob-shell
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands
   (org-babel-execute:sh
    org-babel-expand-body:sh
@@ -165,28 +185,28 @@
 
 (use-package ob-C
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands
   (org-babel-execute:C
    org-babel-expand-body:C))
 
 (use-package ob-R
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands
   (org-babel-execute:R
    org-babel-expand-body:R))
 
 (use-package ob-ditaa
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands
   (org-babel-execute:ditaa
    org-babel-expand-body:ditaa))
 
 (use-package ob-gnuplot
   :defer t
-  :ensure org-plus-contrib
+  :ensure org-contrib
   :commands
   (org-babel-execute:gnuplot
    org-babel-expand-body:gnuplot))
@@ -200,20 +220,6 @@
 (require 'whitespace)
 (setq whitespace-style '(face empty tabs lines-tail trailing))
 (global-whitespace-mode t)
-
-(require 'package)
-(setq package-enable-at-startup nil)
-(setq package-archives
-	     '(("melpa" . "http://melpa.org/packages/")
-	       ("gnu" . "https://elpa.gnu.org/packages/")
-	       ("org" . "http://orgmode.org/elpa/")))
-
-(package-initialize)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(require 'use-package)
 
 (use-package avy
   :ensure t
@@ -247,12 +253,11 @@
 	      ("C-p" . company-select-previous)
 	      ("M-<" . company-select-first)
 	      ("M->" . company-select-last)
-	      ("SPC" . company-abort)
-	      )
+	      ("SPC" . company-abort))
   )
 
   (defun ora-company-number ()
-    "Forward to `company-complete-number'. 
+    "Forward to `company-complete-number'.
 
      Unless the number is potentially part of the candidate.
      In that case, insert the number"
@@ -264,10 +269,14 @@
 	(self-insert-command 1)
       (company-complete-number (string-to-number k)))))
 
-(mapc (lambda (x) (define-key company-active-map
-		 (format "%d" x)
-		 'ora-company-number))
-	(number-sequence 0 9))
+;; (let ((map company-active-map))
+;; (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+;; 	(number-sequence 0 9))
+;; (define-key map " " (lambda ()
+;;                       (interactive)
+;;                       (company-abort)
+;;                       (self-insert-command 1)))
+;; (define-key map (kbd "<return>") nil))
 
 (use-package company-irony
   :ensure t
@@ -616,8 +625,6 @@ minibuffer-local-completion-map))
 (when window-system (global-prettify-symbols-mode t))
 
 (setq prettify-symbols-unprettify-at-point 'right-edge)
-
-(set-frame-font "M+ 1mn")
 
 (unless (package-installed-p 'moe-theme)
   (package-refresh-contents)
