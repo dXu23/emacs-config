@@ -10,10 +10,6 @@
 
 (setq inhibit-startup-message t)
 
-(setq x-select-enable-clipboard-manager nil)
-
-(setq make-backup-file nil)
-
 (setq create-lockfiles nil)
 
 (setq auto-save-default nil)
@@ -41,8 +37,6 @@
    (other-window 1)
    )
 
-
-
  (defun split-and-follow-vertically ()
    "Splits a window vertically and follows to opened window"
    (interactive)
@@ -50,27 +44,9 @@
    (balance-windows)
    (other-window 1)
    )
+
 (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
- (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
-
-(defun compile-based-on-extension (&optional args) 
-    "Compile/run a file based on its extension"
-    (interactive "P")
-    (setq file-extension (file-name-extension buffer-file-name))
-    (setq executable-name (file-name-base buffer-file-name))
-    (cond ((string= file-extension "c")
-	  (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	  ((string= file-extension "cpp")
-	   (compile (concat "g++ -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	  ((string= file-extension "java")
-	  (compile (concat "javac " buffer-file-name " && java " executable-name)))
-    )
-)
-
-(defun my-compile ()
-  (interactive)
-  (let ((default-directory (locate-dominating-file "." "Makefile")))
-    (compile "make")))
+(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 
 (defun mp-insert-date ()
   (interactive)
@@ -91,6 +67,12 @@
 
 (global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 
+(require 'eshell)
+(require 'em-smart)
+(setq eshell-where-to-jump 'begin)
+(setq eshell-review-quick-commands nil)
+(setq eshell-smart-space-goes-to-end t)
+
 (setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
 (setq ido-use-filename-at-point 'guess)
@@ -98,14 +80,10 @@
 ;; (require 'ido)
 ;; (ido-mode t)
 
-(require 'whitespace)
-(setq whitespace-style '(face empty tabs lines-tail trailing))
-(global-whitespace-mode t)
-
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-switchb)
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c b") 'org-switchb)
 
 ;; (require 'org-checklist)
 
@@ -170,19 +148,59 @@
 
 (setq org-adapt-indentation nil)
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '(
-   (shell . t)
-   (C . t)
-   (python . t)
-   (R . t)
-   (ditaa . t)
-   (gnuplot . t)
-   ))
+(use-package ob-python
+  :defer t
+  :ensure org-plus-contrib
+  :commands (org-babel-execute:python))
 
-;; <use-package>
-;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(use-package ob-shell
+  :defer t
+  :ensure org-plus-contrib
+  :commands
+  (org-babel-execute:sh
+   org-babel-expand-body:sh
+
+   org-babel-execute:bash
+   org-babel-expand-body:bash))
+
+(use-package ob-C
+  :defer t
+  :ensure org-plus-contrib
+  :commands
+  (org-babel-execute:C
+   org-babel-expand-body:C))
+
+(use-package ob-R
+  :defer t
+  :ensure org-plus-contrib
+  :commands
+  (org-babel-execute:R
+   org-babel-expand-body:R))
+
+(use-package ob-ditaa
+  :defer t
+  :ensure org-plus-contrib
+  :commands
+  (org-babel-execute:ditaa
+   org-babel-expand-body:ditaa))
+
+(use-package ob-gnuplot
+  :defer t
+  :ensure org-plus-contrib
+  :commands
+  (org-babel-execute:gnuplot
+   org-babel-expand-body:gnuplot))
+
+(defun proced-settings ()
+  "Function for setting proced settings."
+  (proced-toggle-auto-update))
+
+(add-hook 'proced-mode-hook 'proced-settings)
+
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+(global-whitespace-mode t)
+
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives
@@ -196,32 +214,15 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
-;; </use-package
 
 (use-package avy
-  :ensure t)
-
-(defun avy-goto-char-n (&optional n arg beg end &rest chars)
-  (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
-      (let ((count 1)
-	   (charList '()))
-	       (while (<= count (prefix-numeric-value current-prefix-arg))
-		 (push (read-char (format "char %d: " count) t) charList)
-		 (setq count (1+ count))
-		 )
-	       (reverse charList))
-	     )
-  )
-
-  (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
-  (avy-with avy-goto-char-n
-    (avy-jump
-     (regexp-quote (concat chars))
-     :window-flip arg
-     :beg beg
-     :end end)))
-
-(global-set-key (kbd "C-:") 'avy-goto-char-n)
+  :ensure t
+  :bind (("C-:" . avy-goto-char)
+	 ("C-'" . avy-goto-char-2)
+	 ("M-g f" . avy-goto-line)
+	 ("M-g w" . avy-goto-word-1)
+	 ("M-g e" . avy-goto-word-0))
+)
 
 (use-package beacon
   :ensure t
@@ -233,7 +234,9 @@
 
 (use-package company
   :ensure t
+  :hook (scala-mode . company-mode)
   :config
+  (setq lsp-company-provider :capf)
   (setq company-idle-delay 0.5)
   (setq company-show-numbers t)
   (setq company-minimum-prefix-length 3)
@@ -242,6 +245,8 @@
 	      ("M-p" . nil)
 	      ("C-n" . company-select-next)
 	      ("C-p" . company-select-previous)
+	      ("M-<" . company-select-first)
+	      ("M->" . company-select-last)
 	      ("SPC" . company-abort)
 	      )
   )
@@ -254,15 +259,15 @@
     (interactive)
     (let* ((k (this-command-keys))
 	 (re (concat "^" command-prefix k)))
-    (if (cl-find-if (lambda (s) (string-match re s))
+    (if (find-if (lambda (s) (string-match re s))
 		    company-candidates)
 	(self-insert-command 1)
       (company-complete-number (string-to-number k)))))
 
-;;(mapc (lambda (x) (define-key company-active-map
-;;		   (format "%d" x)
-;;		   'ora-company-number))
-;;	  (number-sequence 0 9))
+(mapc (lambda (x) (define-key company-active-map
+		 (format "%d" x)
+		 'ora-company-number))
+	(number-sequence 0 9))
 
 (use-package company-irony
   :ensure t
@@ -280,44 +285,113 @@
   :after company
 )
 
+(use-package counsel
+  :ensure t
+  :after (ivy swiper)
+  :bind (("M-x" . counsel-M-x)
+	 ("C-c j" . counsel-git-grep)
+	 ("C-h b" . counsel-descbinds)
+	 ("C-h f" . counsel-describe-function)
+	 ("C-h v". counsel-describe-variable)
+	 ("C-h a" . counsel-apropos)
+	 ("C-h S" . counsel-info-lookup-symbol)
+	 ("C-x r b" . counsel-bookmark)
+	 ("C-x C-f" . counsel-find-file)
+	 ("C-c P" . counsel-package)
+	 ("C-r" . counsel-minibuffer-history)
+	 :map minibuffer-local-map
+	 ("C-r" . counsel-minibuffer-history)
+	 :map shell-mode-map
+	 ("C-r" . counsel-shell-history)))
+
+(use-package dap-mode
+  :after (lsp-mode)
+  :hook
+  (lsp-mode . dap-mode)
+  (lsp-mode . dap-ui-mode)
+  )
+
 ;;  (use-package exec-path-from-shell
 ;;    :config
 ;;    (when (memq window-system '(mac ns x))
 ;;      (exec-path-from-shell-initialize))
 ;;    )
 
-;; (use-package hydra
-;;  :config
-;;  (defhydra hydra-zoom (global-map "<f2>")
-;;    "zoom"
-;;    ("g" text-scale-increase "in")
-;;    ("l" text-scale-decrease "out"))
+(use-package flycheck
+  :init (global-flycheck-mode))
 
-;;  (global-set-key
-;;   (kbd "C-n")
-;;   (defhydra hydra-move
-;;     (:body-pre (next-line))
-;;     "move"
-;;     ("n" next-line)
-;;     ("p" previous-line)
-;;     ("f" forward-char)
-;;     ("F" forward-word)
-;;     ("b" backward-char)
-;;     ("B" backward-word)
-;;     ("a" move-beginning-of-line)
-;;     ("A" backward-sentence)
-;;     ("e" move-end-of-line)
-;;     ("E" forward-sentence)
-;;     ("v" scroll-up-command)
-;;     ("V" scroll-down-command)
-;;     ("l" recenter-top-bottom))
-;;   )
-;;  )
+(use-package hydra
+ :config
+ (defhydra hydra-zoom (global-map "<f2>")
+   "zoom"
+   ("g" text-scale-increase "in")
+   ("l" text-scale-decrease "out")))
+
+(global-set-key
+ (kbd "C-n")
+ (defhydra hydra-move
+   (:body-pre (next-line))
+   "move"
+   ("n" next-line)
+   ("p" previous-line)
+   ("f" forward-char)
+   ("F" forward-word)
+   ("b" backward-char)
+   ("B" backward-word)
+   ("a" move-beginning-of-line)
+   ("A" backward-sentence)
+   ("e" move-end-of-line)
+   ("E" forward-sentence)
+   ("v" scroll-up-command)
+   ("V" scroll-down-command)
+   ("l" recenter-top-bottom)
+   (">" end-of-buffer)
+   ("<" beginning-of-buffer))
+ )
 
 (use-package ivy
-  :ensure t)
+    :ensure t
+    :config
+    (ivy-mode 1)
+    :custom
+    (ivy-use-virtual-buffers t)
+    (ivy-height 10)
+    (ivy-count-format "%d/%d ")
+    (ivy-initial-inputs-alist nil)
+    (ivy-rebuilders-alist '((t . ivy--regex-ignore-order)))
+    :bind
+    (("C-c C-r" . ivy-resume)
+     ("C-x b" . ivy-switch-buffer)
+     :map ivy-minibuffer-map
+     ("C-n" . ivy-next-line))
+)
 
 ;;  (use-package htmlize)
+
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :custom
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  :hook (scala-mode .lsp)
+  (lsp-mode . lsp-lens-mode)
+  :config
+  (setq lsp-prefer-flymake nil))
+
+(use-package lsp-ui
+  :ensure
+  :after lsp
+  :hook lsp-mode-hook
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-show-hover t)
+  (lsp-ui-doc-enable t))
+
+(use-package lsp-metals
+  :after lsp-mode)
 
 (use-package magit
   :ensure t
@@ -330,29 +404,108 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
-;;  (use-package python-mode)
-;;use-package 'python-mode
-;; :config
-;; (setq-default py-shell-name "ipython")
-;; (setq-default py-which-bufname "IPython")
-;;
-;; (setq py-force-py-shell-name-p t)
-;;
-;; (setq py-shell-switch-buffers-on-execute-p t)
-;; (setq py-switch-buffers-on-execute-p t)
-;;
-;; (setq py-split-windows-on-execute-p nil)
-;;
-;; (setq py-smart-indentation t)
-;;
+(use-package paredit
+  :ensure t
+  :hook ((emacs-lisp-mode-hook . paredit-mode)
+	 (lisp-interaction-mode-hook . paredit-mode)
+	 (ielm-mode-hook . paredit-mode)
+	 (lisp-mode-hook . paredit-mode)
+	 (eval-expression-minibuffer-setup-hook . paredit-mode))
+  :bind (("C-M-u" . paredit-backward-up)
+	 ("C-M-n" . paredit-forward-up)
+	 ("M-S" . paredit-splice-sexp-killing-backward)
+	 ("M-R" . paredit-raise-sexp)
+	 ("M-(" . paredit-wrap-round)
+	 ("M-[" . paredit-wrap-square)
+	 ("M-{" . paredit-wrap-curly))
+  :config
+  (diminish 'paredit-mode "()"))
 
-;; (use-package rainbow-mode
-;;  :ensure t
-;;  :init (rainbow-mode 1))
+(use-package projectile
+  :ensure t
+  :after (magit cider)
+  :init
+  (projectile-mode +1)
+  :bind-keymap ("C-c p" . projectile-command-map)
+  :bind (("C-x p" . projectile-mode-map)
+	 :map projectile-mode-map
+	 ("s-p" . projectile-command-map))
+  :custom
+  (projectile-create-missing-test-files t)
+  (projectile-switch-projectile-action projectile-commander)
+  :config
+  (def-projectile-commander-method ?s
+    "Open a *shell* buffer for the project."
+    (projectile-run-shell))
+  (def-projectile-commander-method ?c
+    "Run `compile' in the project."
+    (projectile-compile-project nil))
+
+  (def-projectile-commander-method ?\C-?
+    "Go back to project selection."
+    (projectile-switch-project))
+
+  (def-projectile-commander-method ?d
+    "Open project root in dired."
+    (projectile-dired))
+
+  (def-projectile-commander-method ?F
+    "Git fetch."
+    (magit-status)
+    (if (fboundp 'magit-fetch-from-upstream)
+	(call-interactively #'magit-fetch-from-upstream)
+      (call-interactively #'magit-fetch-current)))
+
+  (def-projectile-commander-method ?j
+    "Jack-in."
+    (let* ((opts (projectile-current-project-files))
+	   (file (ido-completing-read
+		  "Find file: "
+		  opts
+		  nil nil nil nil
+		  (car (cl-member-if
+			(lambda (f)
+			  (string-match "core\\.clj\\'" f))
+			opts)))))
+      (find-file (expand-file-name
+		  file (projectile-project-root)))
+      (run-hooks 'projectile-find-file-hook)
+      (cider-jack-in)))
+  )
+
+(use-package python-mode
+  :custom
+  (py-shell-name "ipython")
+  (py-force-py-shell-name-p t)
+  (py-switch-buffers-on-execute-p t)
+  (py-smart-indentation t)
+  (py-split-windows-on-execute-p nil)
+  (py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
+  (py-smart-indentation t)
+  :config
+  (setq-default py-which-bufname "IPython"))
+
+
+
+ ;;
+
+(use-package rainbow-mode
+ :ensure t
+ :init (rainbow-mode 1))
 
 (use-package swiper
   :ensure t
-  :bind ("C-s" . swiper-isearch))
+  :after ivy
+  :bind (("C-s" . swiper-isearch)))
+
+(use-package sbt-mode
+:commands sbt-start sbt-command
+:config
+;; WORKAROUND: allows using SPACE when in the minibuffer
+(substitute-key-definition
+'minibuffer-complete-word
+'self-insert-command
+minibuffer-local-completion-map))
 
 (use-package switch-window
   :ensure t
@@ -366,19 +519,26 @@
   :bind
   ([remap other-window] . switch-window))
 
+(use-package paradox
+  :config
+  (paradox-enable)
+)
+
 (use-package popup-kill-ring
   :ensure t
   :bind ("M-y" . popup-kill-ring)
   :config
   (setq save-interprogram-paste-before-kill t))
 
+(use-package unicode-fonts
+  :ensure t
+  :config
+  (unicode-fonts-setup))
+
 (use-package which-key
   :ensure t
   :init
   (which-key-mode))
-
-(use-package 4clojure
-  :ensure t)
 
 (use-package yasnippet
   :ensure t
@@ -388,10 +548,10 @@
   (yas-reload-all)
   (yas-global-mode 1))
 
+(setq default-tab-width 4)
+
 (tool-bar-mode -1)
-
 (menu-bar-mode -1)
-
 (scroll-bar-mode -1)
 
 (column-number-mode 1)
@@ -455,6 +615,8 @@
 
 (when window-system (global-prettify-symbols-mode t))
 
+(setq prettify-symbols-unprettify-at-point 'right-edge)
+
 (set-frame-font "M+ 1mn")
 
 (unless (package-installed-p 'moe-theme)
@@ -462,7 +624,80 @@
   (package-install 'moe-theme))
 
 (require 'moe-theme)
-(moe-light)
+(moe-dark)
+
+(setq-default c-basic-offset 4)
+
+(use-package cider)
+
+;; (global-set-key (kbd "C-c e l") #'find-library)
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+
+(setq library-lisp-implementations '((sbcl ("sbcl")))
+      slime-default-lisp 'sbcl
+      slime-contribs '(slime-fancy))
+
+(use-package paren-face
+  :defer)
+
+(defun my-emacs-lisp-mode-hook-fn ()
+  (set (make-local-variable 'lisp-indent-function) #'lisp-indent-function)
+  (local-set-key (kbd "C-c S") (global-key-binding (kbd "M-s")))
+  (show-paren-mode 1)
+  (paren-face-mode)
+  )
+
+(use-package slime-company
+  :defer)
+
+(use-package slime
+  :demand
+  :config
+  (slime-setup '(slime-fancy slime-company slime-cl-indent)))
+
+(add-to-list 'file-name-handler-alist '("\\.class$" . javap-handler))
+
+(defun javap-handler (op &rest args)
+  "Handle .class files by putting the output of javap in the buffer."
+  (cond
+   ((eq op 'get-file-buffer)
+    (let ((file (car args)))
+      (with-current-buffer (create-file-buffer file)
+	(call-process "javap" nil (current-buffer) nil "-verbose"
+		      "-classpath" (file-name-directory file)
+		      (file-name-sans-extension
+		       (file-name-nondirectory file)))
+	(setq buffer-file-name file)
+	(setq buffer-read-only t)
+	(set-buffer-modified-p nil)
+	(goto-char (point-min))
+	(java-mode)
+	(current-buffer))))
+   ((javap-handler-real op args))))
+
+(defun javap-handler-real (operation args)
+  "Run the real handler without the javap handler installed."
+  (let ((inhibit-file-name-handlers
+	 (cons 'javap-handler
+	       (and (eq inhibit-file-name-operation operation)
+		    inhibit-file-name-handlers)))
+	(inhibit-file-name-operation operation))
+    (apply operation args)))
+
+(use-package scala-mode
+  :mode "\\.\\(sc\\|scala\\)|\\'"
+  :interpreter
+  ("scala" . scala-mode))
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+  (setq sbt:program-options '("-Dsbt.supershell=false"))
+  )
 
 (defvar my-term-shell "/bin/bash")
 (defadvice ansi-term (before force-bash)

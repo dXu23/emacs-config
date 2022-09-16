@@ -21,12 +21,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-message t)
 #+END_SRC
-** Prevent emacs from freezing when pressing 'C-x C-c'
-#+BEGIN_SRC emacs-lisp
-(setq x-select-enable-clipboard-manager nil)
-#+END_SRC
 ** Prevent emacs from making backup files
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC elisp
 (setq make-backup-file nil)
 #+END_SRC
 ** Get rid of lock mode.
@@ -64,8 +60,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (setq display-line-numbers 'relative)
 #+END_SRC
 
-* Some preferred keybindings
-** Set 'M-S-z' to zap-up-to-char
+** Some preferred keybindings
+** Set 'M-z' to zap-up-to-char
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\M-Z" 'zap-up-to-char)
 #+END_SRC
@@ -79,8 +75,6 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (other-window 1)
     )
 
-  
-
   (defun split-and-follow-vertically ()
     "Splits a window vertically and follows to opened window"
     (interactive)
@@ -88,33 +82,12 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (balance-windows)
     (other-window 1)
     )
+
  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
-  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
-#+END_SRC
-** Making compiling easier
-#+BEGIN_SRC emacs-lisp
-  (defun compile-based-on-extension (&optional args) 
-      "Compile/run a file based on its extension"
-      (interactive "P")
-      (setq file-extension (file-name-extension buffer-file-name))
-      (setq executable-name (file-name-base buffer-file-name))
-      (cond ((string= file-extension "c")
-	    (compile (concat "cc -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	    ((string= file-extension "cpp")
-	     (compile (concat "g++ -o " executable-name " " buffer-file-name " && ./" executable-name)))
-	    ((string= file-extension "java")
-	    (compile (concat "javac " buffer-file-name " && java " executable-name)))
-      )
-  )
-
-  (defun my-compile ()
-    (interactive)
-    (let ((default-directory (locate-dominating-file "." "Makefile")))
-      (compile "make")))
-
-
+ (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 ** Insert date and time easily
+
 #+BEGIN_SRC emacs-lisp
   (defun mp-insert-date ()
     (interactive)
@@ -138,6 +111,14 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   (global-set-key (kbd "C-x r M-w") 'my-copy-rectangle)
 #+END_SRC
 * Preinstalled packages
+** eshell
+#+begin_src emacs-lisp
+  (require 'eshell)
+  (require 'em-smart)
+  (setq eshell-where-to-jump 'begin)
+  (setq eshell-review-quick-commands nil)
+  (setq eshell-smart-space-goes-to-end t)
+#+end_src
 ** ido-mode
 #+BEGIN_SRC emacs-lisp
   (setq ido-enable-flex-matching t)
@@ -147,19 +128,13 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   ;; (require 'ido)
   ;; (ido-mode t)
 #+END_SRC
-** Whitespace
-#+BEGIN_SRC emacs-lisp
-  (require 'whitespace)
-  (setq whitespace-style '(face empty tabs lines-tail trailing))
-  (global-whitespace-mode t)
-#+END_SRC
 ** Org
 *** Org-mode keybindings
 #+BEGIN_SRC emacs-lisp
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-switchb)
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c b") 'org-switchb)
 #+END_SRC
 
 *** Require org-drill
@@ -286,24 +261,80 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+END_SRC
 
 *** Have org-mode support programming languages
-   #+BEGIN_SRC emacs-lisp
-     (org-babel-do-load-languages
-      'org-babel-load-languages
-      '(
-	(shell . t)
-	(C . t)
-	(python . t)
-	(R . t)
-	(ditaa . t)
-	(gnuplot . t)
-	))
-   #+END_SRC
+**** Python
+#+begin_src emacs-lisp
+  (use-package ob-python
+    :defer t
+    :ensure org-plus-contrib
+    :commands (org-babel-execute:python))
+#+end_src
 
+**** Shell
+#+begin_src emacs-lisp
+  (use-package ob-shell
+    :defer t
+    :ensure org-plus-contrib
+    :commands
+    (org-babel-execute:sh
+     org-babel-expand-body:sh
+
+     org-babel-execute:bash
+     org-babel-expand-body:bash))
+#+end_src
+
+**** C
+#+begin_src emacs-lisp
+  (use-package ob-C
+    :defer t
+    :ensure org-plus-contrib
+    :commands
+    (org-babel-execute:C
+     org-babel-expand-body:C))
+#+end_src
+**** R
+#+begin_src emacs-lisp
+  (use-package ob-R
+    :defer t
+    :ensure org-plus-contrib
+    :commands
+    (org-babel-execute:R
+     org-babel-expand-body:R))
+#+end_src
+**** ditaa
+#+begin_src emacs-lisp
+    (use-package ob-ditaa
+      :defer t
+      :ensure org-plus-contrib
+      :commands
+      (org-babel-execute:ditaa
+       org-babel-expand-body:ditaa))
+#+end_src
+**** gnuplot
+#+begin_src emacs-lisp
+      (use-package ob-gnuplot
+	:defer t
+	:ensure org-plus-contrib
+	:commands
+	(org-babel-execute:gnuplot
+	 org-babel-expand-body:gnuplot))
+#+end_src
+** Proced
+#+begin_src emacs-lisp
+  (defun proced-settings ()
+    "Function for setting proced settings."
+    (proced-toggle-auto-update))
+
+  (add-hook 'proced-mode-hook 'proced-settings)
+#+end_src
+** Whitespace
+#+BEGIN_SRC emacs-lisp
+  (require 'whitespace)
+  (setq whitespace-style '(face empty tabs lines-tail trailing))
+  (global-whitespace-mode t)
+#+END_SRC
 * Extra Packages
 ** package-list
 #+BEGIN_SRC emacs-lisp
-  ;; <use-package>
-  ;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives
@@ -317,35 +348,18 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (package-refresh-contents)
     (package-install 'use-package))
   (require 'use-package)
-  ;; </use-package
 #+END_SRC
 
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :ensure t)
-
-  (defun avy-goto-char-n (&optional n arg beg end &rest chars)
-    (interactive (append '((prefix-numeric-value current-prefix-arg) nil nil nil)
-	(let ((count 1)
-	     (charList '()))
-		 (while (<= count (prefix-numeric-value current-prefix-arg))
-		   (push (read-char (format "char %d: " count) t) charList)
-		   (setq count (1+ count))
-		   )
-		 (reverse charList))
-	       )
-    )
-
-    (mapcar (lambda (char) (when (eq char ?) (setq char ?\n))) chars)
-    (avy-with avy-goto-char-n
-      (avy-jump
-       (regexp-quote (concat chars))
-       :window-flip arg
-       :beg beg
-       :end end)))
-
-  (global-set-key (kbd "C-:") 'avy-goto-char-n)
+    :ensure t
+    :bind (("C-:" . avy-goto-char)
+	   ("C-'" . avy-goto-char-2)
+	   ("M-g f" . avy-goto-line)
+	   ("M-g w" . avy-goto-word-1)
+	   ("M-g e" . avy-goto-word-0))
+  )
 #+END_SRC
 
 ** beacon
@@ -355,6 +369,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
   :init
   (beacon-mode 1))
 #+END_SRC
+
 ** Cider
     Package for clojure
 #+BEGIN_SRC emacs-lisp
@@ -364,38 +379,42 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 ** Company
 #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :ensure t
-      :config
-      (setq company-idle-delay 0.5)
-      (setq company-show-numbers t)
-      (setq company-minimum-prefix-length 3)
-      :bind (:map company-active-map
-		  ("M-n" . nil)
-		  ("M-p" . nil)
-		  ("C-n" . company-select-next)
-		  ("C-p" . company-select-previous)
-		  ("SPC" . company-abort)
-		  )
-      )
+  (use-package company
+    :ensure t
+    :hook (scala-mode . company-mode)
+    :config
+    (setq lsp-company-provider :capf)
+    (setq company-idle-delay 0.5)
+    (setq company-show-numbers t)
+    (setq company-minimum-prefix-length 3)
+    :bind (:map company-active-map
+		("M-n" . nil)
+		("M-p" . nil)
+		("C-n" . company-select-next)
+		("C-p" . company-select-previous)
+		("M-<" . company-select-first)
+		("M->" . company-select-last)
+		("SPC" . company-abort)
+		)
+    )
 
-      (defun ora-company-number ()
-	"Forward to `company-complete-number'. 
+    (defun ora-company-number ()
+      "Forward to `company-complete-number'. 
 
-	 Unless the number is potentially part of the candidate.
-	 In that case, insert the number"
-	(interactive)
-	(let* ((k (this-command-keys))
-	     (re (concat "^" command-prefix k)))
-	(if (find-if (lambda (s) (string-match re s))
-			company-candidates)
-	    (self-insert-command 1)
-	  (company-complete-number (string-to-number k)))))
+       Unless the number is potentially part of the candidate.
+       In that case, insert the number"
+      (interactive)
+      (let* ((k (this-command-keys))
+	   (re (concat "^" command-prefix k)))
+      (if (find-if (lambda (s) (string-match re s))
+		      company-candidates)
+	  (self-insert-command 1)
+	(company-complete-number (string-to-number k)))))
 
-    ;;(mapc (lambda (x) (define-key company-active-map
-    ;;		   (format "%d" x)
-    ;;		   'ora-company-number))
-    ;;	  (number-sequence 0 9))
+  (mapc (lambda (x) (define-key company-active-map
+		   (format "%d" x)
+		   'ora-company-number))
+	  (number-sequence 0 9))
 
 
 #+END_SRC
@@ -419,6 +438,36 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     :after company
   )
 #+END_SRC
+** Counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :ensure t
+    :after (ivy swiper)
+    :bind (("M-x" . counsel-M-x)
+	   ("C-c j" . counsel-git-grep)
+	   ("C-h b" . counsel-descbinds)
+	   ("C-h f" . counsel-describe-function)
+	   ("C-h v". counsel-describe-variable)
+	   ("C-h a" . counsel-apropos)
+	   ("C-h S" . counsel-info-lookup-symbol)
+	   ("C-x r b" . counsel-bookmark)
+	   ("C-x C-f" . counsel-find-file)
+	   ("C-c P" . counsel-package)
+	   ("C-r" . counsel-minibuffer-history)
+	   :map minibuffer-local-map
+	   ("C-r" . counsel-minibuffer-history)
+	   :map shell-mode-map
+	   ("C-r" . counsel-shell-history)))
+#+end_src
+** Debug Adapter Protocol
+#+begin_src emacs-lisp
+  (use-package dap-mode
+    :after (lsp-mode)
+    :hook
+    (lsp-mode . dap-mode)
+    (lsp-mode . dap-ui-mode)
+    )
+ #+end_src
 ** Exec-from-path-initialize
 #+BEGIN_SRC emacs-lisp
 ;;  (use-package exec-path-from-shell
@@ -427,7 +476,11 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ;;      (exec-path-from-shell-initialize))
 ;;    )
 #+END_SRC
-
+** Fly Check
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :init (global-flycheck-mode))
+#+end_src
 ** Hydra
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
@@ -437,41 +490,89 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
      ("g" text-scale-increase "in")
      ("l" text-scale-decrease "out")))
 
-  ;;  (global-set-key
-  ;;   (kbd "C-n")
-  ;;   (defhydra hydra-move
-  ;;     (:body-pre (next-line))
-  ;;     "move"
-  ;;     ("n" next-line)
-  ;;     ("p" previous-line)
-  ;;     ("f" forward-char)
-  ;;     ("F" forward-word)
-  ;;     ("b" backward-char)
-  ;;     ("B" backward-word)
-  ;;     ("a" move-beginning-of-line)
-  ;;     ("A" backward-sentence)
-  ;;     ("e" move-end-of-line)
-  ;;     ("E" forward-sentence)
-  ;;     ("v" scroll-up-command)
-  ;;     ("V" scroll-down-command)
-  ;;     ("l" recenter-top-bottom))
-  ;;   )
-  ;;  )
-
+  (global-set-key
+   (kbd "C-n")
+   (defhydra hydra-move
+     (:body-pre (next-line))
+     "move"
+     ("n" next-line)
+     ("p" previous-line)
+     ("f" forward-char)
+     ("F" forward-word)
+     ("b" backward-char)
+     ("B" backward-word)
+     ("a" move-beginning-of-line)
+     ("A" backward-sentence)
+     ("e" move-end-of-line)
+     ("E" forward-sentence)
+     ("v" scroll-up-command)
+     ("V" scroll-down-command)
+     ("l" recenter-top-bottom)
+     (">" end-of-buffer)
+     ("<" beginning-of-buffer))
+   )
 
 #+END_SRC
 ** Ivy
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t
-    :bind
-    ("C-x b" . ivy-switch-buffer))
+    (use-package ivy
+      :ensure t
+      :config
+      (ivy-mode 1)
+      :custom
+      (ivy-use-virtual-buffers t)
+      (ivy-height 10)
+      (ivy-count-format "%d/%d ")
+      (ivy-initial-inputs-alist nil)
+      (ivy-rebuilders-alist '((t . ivy--regex-ignore-order)))
+      :bind
+      (("C-c C-r" . ivy-resume)
+       ("C-x b" . ivy-switch-buffer)
+       :map ivy-minibuffer-map
+       ("C-n" . ivy-next-line))
+  )
+
+
 #+END_SRC
 
 ** htmlize
 #+BEGIN_SRC emacs-lisp
 ;;  (use-package htmlize)
 #+END_SRC
+
+** lsp-mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure
+    :commands lsp
+    :custom
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    (lsp-eldoc-render-all t)
+    (lsp-idle-delay 0.6)
+    (lsp-rust-analyzer-server-display-inlay-hints t)
+    :hook (scala-mode .lsp)
+    (lsp-mode . lsp-lens-mode)
+    :config
+    (setq lsp-prefer-flymake nil))
+
+#+end_src
+
+** lsp-ui
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure
+    :after lsp
+    :hook lsp-mode-hook
+    :custom
+    (lsp-ui-peek-always-show t)
+    (lsp-ui-show-hover t)
+    (lsp-ui-doc-enable t))
+#+end_src
+** lsp-metals
+#+begin_src emacs-lisp
+  (use-package lsp-metals
+    :after lsp-mode)
+ #+end_src
 
 ** Magit
 
@@ -489,30 +590,104 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
      :config
      (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
  #+END_SRC
+** Paredit
+#+begin_src emacs-lisp
+  (use-package paredit
+    :ensure t
+    :hook ((emacs-lisp-mode-hook . paredit-mode)
+	   (lisp-interaction-mode-hook . paredit-mode)
+	   (ielm-mode-hook . paredit-mode)
+	   (lisp-mode-hook . paredit-mode)
+	   (eval-expression-minibuffer-setup-hook . paredit-mode))
+    :bind (("C-M-u" . paredit-backward-up)
+	   ("C-M-n" . paredit-forward-up)
+	   ("M-S" . paredit-splice-sexp-killing-backward)
+	   ("M-R" . paredit-raise-sexp)
+	   ("M-(" . paredit-wrap-round)
+	   ("M-[" . paredit-wrap-square)
+	   ("M-{" . paredit-wrap-curly))
+    :config
+    (diminish 'paredit-mode "()"))
+#+end_src
+** Projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :after (magit cider)
+    :init
+    (projectile-mode +1)
+    :bind-keymap ("C-c p" . projectile-command-map)
+    :bind (("C-x p" . projectile-mode-map)
+	   :map projectile-mode-map
+	   ("s-p" . projectile-command-map))
+    :custom
+    (projectile-create-missing-test-files t)
+    (projectile-switch-projectile-action projectile-commander)
+    :config
+    (def-projectile-commander-method ?s
+      "Open a *shell* buffer for the project."
+      (projectile-run-shell))
+    (def-projectile-commander-method ?c
+      "Run `compile' in the project."
+      (projectile-compile-project nil))
+
+    (def-projectile-commander-method ?\C-?
+      "Go back to project selection."
+      (projectile-switch-project))
+
+    (def-projectile-commander-method ?d
+      "Open project root in dired."
+      (projectile-dired))
+
+    (def-projectile-commander-method ?F
+      "Git fetch."
+      (magit-status)
+      (if (fboundp 'magit-fetch-from-upstream)
+	  (call-interactively #'magit-fetch-from-upstream)
+	(call-interactively #'magit-fetch-current)))
+
+    (def-projectile-commander-method ?j
+      "Jack-in."
+      (let* ((opts (projectile-current-project-files))
+	     (file (ido-completing-read
+		    "Find file: "
+		    opts
+		    nil nil nil nil
+		    (car (cl-member-if
+			  (lambda (f)
+			    (string-match "core\\.clj\\'" f))
+			  opts)))))
+	(find-file (expand-file-name
+		    file (projectile-project-root)))
+	(run-hooks 'projectile-find-file-hook)
+	(cider-jack-in)))
+    )
+#+end_src
 ** Python mode
 #+BEGIN_SRC emacs-lisp
 
-  ;;  (use-package python-mode)
-  ;;use-package 'python-mode
-  ;; :config
-  ;; (setq-default py-shell-name "ipython")
-  ;; (setq-default py-which-bufname "IPython")
-  ;;
-  ;; (setq py-force-py-shell-name-p t)
-  ;;
-  ;; (setq py-shell-switch-buffers-on-execute-p t)
-  ;; (setq py-switch-buffers-on-execute-p t)
-  ;;
-  ;; (setq py-split-windows-on-execute-p nil)
-  ;;
-  ;; (setq py-smart-indentation t)
-  ;;
+  (use-package python-mode
+    :custom
+    (py-shell-name "ipython")
+    (py-force-py-shell-name-p t)
+    (py-switch-buffers-on-execute-p t)
+    (py-smart-indentation t)
+    (py-split-windows-on-execute-p nil)
+    (py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
+    (py-smart-indentation t)
+    :config
+    (setq-default py-which-bufname "IPython"))
+
+
+
+   ;;
+
 #+END_SRC
 ** rainbow
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package rainbow-mode
-  ;;  :ensure t
-  ;;  :init (rainbow-mode 1))
+  (use-package rainbow-mode
+   :ensure t
+   :init (rainbow-mode 1))
 
 #+END_SRC
 
@@ -520,8 +695,8 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
-    :bind ("C-s" . swiper-isearch))
-
+    :after ivy
+    :bind (("C-s" . swiper-isearch)))
 #+END_SRC
 ** sbt-mode
 #+begin_src emacs-lisp
@@ -551,7 +726,13 @@ minibuffer-local-completion-map))
     ([remap other-window] . switch-window))
 
 #+END_SRC
-
+** paradox
+#+begin_src emacs-lisp
+  (use-package paradox
+    :config
+    (paradox-enable)
+  )
+#+end_src
 ** popup-kill-ring
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
@@ -561,7 +742,13 @@ minibuffer-local-completion-map))
     (setq save-interprogram-paste-before-kill t))
 
 #+END_SRC
-
+** unicode
+#+begin_src emacs-lisp
+  (use-package unicode-fonts
+    :ensure t
+    :config
+    (unicode-fonts-setup))
+#+end_src
 ** which-key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -570,11 +757,6 @@ minibuffer-local-completion-map))
   (which-key-mode))
 #+END_SRC
 
-** 4clojure
-#+BEGIN_SRC emacs-lisp
-  (use-package 4clojure
-    :ensure t)
-#+END_SRC
 ** Yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -588,22 +770,13 @@ minibuffer-local-completion-map))
 #+END_SRC
 * Aesthetic Changes
 ** Change default tab-with to 4 spaces
-#+BEGIN_SRC elisp
+#+BEGIN_SRC emacs-lisp
   (setq default-tab-width 4)
 #+END_SRC
 ** Getting rid of all bars
-*** Tool bar
 #+BEGIN_SRC emacs-lisp
 (tool-bar-mode -1)
-#+END_SRC
-
-*** Menu bar
-#+BEGIN_SRC emacs-lisp
 (menu-bar-mode -1)
-#+END_SRC
-
-*** Scroll bar
-#+BEGIN_SRC emacs-lisp
 (scroll-bar-mode -1)
 #+END_SRC
 ** Change modeline
@@ -672,6 +845,8 @@ minibuffer-local-completion-map))
 ** Prettify symbols
 #+BEGIN_SRC emacs-lisp
 (when window-system (global-prettify-symbols-mode t))
+
+(setq prettify-symbols-unprettify-at-point 'right-edge)
 #+END_SRC
 ** Set font to M+ 1mn
 #+BEGIN_SRC emacs-lisp
@@ -684,17 +859,96 @@ minibuffer-local-completion-map))
   (package-install 'moe-theme))
 
 (require 'moe-theme)
-(moe-light)
+(moe-dark)
 #+END_SRC
 * Language-Specific Settings
 ** C
-#+BEGIN_SRC elisp
+#+BEGIN_SRC emacs-lisp
   (setq-default c-basic-offset 4)
 #+END_SRC
 ** Clojure
-#+BEGIN_SRC elisp
+#+BEGIN_SRC emacs-lisp
   (use-package cider)
 #+END_SRC
+** Common Lisp
+#+begin_src emacs-lisp
+  ;; (global-set-key (kbd "C-c e l") #'find-library)
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+
+  (setq library-lisp-implementations '((sbcl ("sbcl")))
+	slime-default-lisp 'sbcl
+	slime-contribs '(slime-fancy))
+
+  (use-package paren-face
+    :defer)
+
+  (defun my-emacs-lisp-mode-hook-fn ()
+    (set (make-local-variable 'lisp-indent-function) #'lisp-indent-function)
+    (local-set-key (kbd "C-c S") (global-key-binding (kbd "M-s")))
+    (show-paren-mode 1)
+    (paren-face-mode)
+    )
+
+  (use-package slime-company
+    :defer)
+
+  (use-package slime
+    :demand
+    :config
+    (slime-setup '(slime-fancy slime-company slime-cl-indent)))
+
+
+#+end_src
+** Java
+#+begin_src emacs-lisp
+  (add-to-list 'file-name-handler-alist '("\\.class$" . javap-handler))
+
+  (defun javap-handler (op &rest args)
+    "Handle .class files by putting the output of javap in the buffer."
+    (cond
+     ((eq op 'get-file-buffer)
+      (let ((file (car args)))
+	(with-current-buffer (create-file-buffer file)
+	  (call-process "javap" nil (current-buffer) nil "-verbose"
+			"-classpath" (file-name-directory file)
+			(file-name-sans-extension
+			 (file-name-nondirectory file)))
+	  (setq buffer-file-name file)
+	  (setq buffer-read-only t)
+	  (set-buffer-modified-p nil)
+	  (goto-char (point-min))
+	  (java-mode)
+	  (current-buffer))))
+     ((javap-handler-real op args))))
+
+  (defun javap-handler-real (operation args)
+    "Run the real handler without the javap handler installed."
+    (let ((inhibit-file-name-handlers
+	   (cons 'javap-handler
+		 (and (eq inhibit-file-name-operation operation)
+		      inhibit-file-name-handlers)))
+	  (inhibit-file-name-operation operation))
+      (apply operation args)))
+
+#+end_src
+
+** Scala
+#+begin_src emacs-lisp
+  (use-package scala-mode
+    :mode "\\.\\(sc\\|scala\\)|\\'"
+    :interpreter
+    ("scala" . scala-mode))
+
+  (use-package sbt-mode
+    :commands sbt-start sbt-command
+    :config
+    (substitute-key-definition
+     'minibuffer-complete-word
+     'self-insert-command
+     minibuffer-local-completion-map)
+    (setq sbt:program-options '("-Dsbt.supershell=false"))
+    )
+#+end_src
 * Terminal
 ** Setting default shell to bash
 #+BEGIN_SRC emacs-lisp
@@ -703,4 +957,3 @@ minibuffer-local-completion-map))
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
 #+END_SRC
-

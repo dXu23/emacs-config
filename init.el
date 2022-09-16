@@ -20,14 +20,6 @@
 
 (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
 
-;; (defvar my-term-shell "/bin/bash")
-;;  (defadvice ansi-term (before force-bash)
-;;    (interactive (list my-term-shell)))
-;; (ad-activate 'ansi-term)
-
-;; (global-set-key (kbd "<s-return>") 'ansi-term)
-
-
 (setq scroll-conservatively 100)
 
 (setq ring-bell-function 'ignore)
@@ -38,12 +30,27 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(ivy-count-format "%d/%d " t)
+ '(ivy-height 10 t)
+ '(ivy-initial-inputs-alist nil t)
+ '(ivy-rebuilders-alist '((t . ivy--regex-ignore-order)) t)
+ '(ivy-use-virtual-buffers t t)
  '(jdee-jdk-registry
    '(("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
      ("1.8.0_192" . "/usr/lib64/jvm/java-11-openjdk")))
  '(jdee-server-dir "~/jdee-server/target/")
+ '(lsp-eldoc-render-all t t)
+ '(lsp-idle-delay 0.6 t)
+ '(lsp-rust-analyzer-cargo-watch-command "clippy" t)
+ '(lsp-rust-analyzer-server-display-inlay-hints t t)
  '(package-selected-packages
-   '(slime scala-mode org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein)))
+   '(crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org org-plus-contrib python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql org-bullets smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
+ '(py-force-py-shell-name-p t)
+ '(py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
+ '(py-shell-name "ipython")
+ '(py-smart-indentation t)
+ '(py-split-windows-on-execute-p nil t)
+ '(py-switch-buffers-on-execute-p t))
 
 (put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
