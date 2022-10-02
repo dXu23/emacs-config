@@ -37,6 +37,8 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path
+	     (concat (file-name-as-directory (getenv "HOME")) ".local/bin"))
 
 (setq tramp-default-method "ssh")
 
@@ -105,13 +107,32 @@
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c b") 'org-switchb)
 
+(require 'org-capture)
+(require 'org-protocol)
+
+(setq org-protocol-default-template-key "l")
+
 ;; (require 'org-checklist)
 
 (setq org-log-done 'note)
 
-(setq org-agenda-files '("~/gtd/inbox.org"
-			 "~/gtd/gtd.org"
-			 "~/gtd/tickler.org"))
+(setq org-agenda-files (mapcar
+      (lambda (file) (concat (file-name-as-directory (expand-file-name "gtd" (getenv "HOME"))) file))
+      '("inbox.org" "gtd.org" "tickler.org" "agenda.org")))
+
+(defun gtd-save-org-buffers ()
+  "Save `org-agenda-files' buffers without user confirmation.
+See also `org-save-all-org-buffers'"
+  (interactive)
+  (message "Saving org-agenda-files buffers...")
+  (save-some-buffers t (lambda ()
+			 (when (member (buffer-file-name) org-agenda-files)
+			   t)))
+  (message "Saving org-agenda-files buffers... done"))
+
+(advice-add 'org-refile :after
+	    (lambda (&rest _)
+	    (gtd-save-org-buffers)))
 
 (setq org-highest-priority ?A)
 (setq org-lowest-priority ?C)
@@ -126,9 +147,58 @@
 			       "* TODO [#A] %i%?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")
 			      ("T" "Tickler" entry
 			       (file+headline "~/gtd/tickler.org" "Tickler")
-			       "* %i%? \n %U")))
+			       "* %i%? \n %U")
+			      ("p" "Protocol" entry
+			       (file+headline "~/gtd/refile.org" "Notes")
+			       "* %:description :RESEARCH:\n#+BEGIN_QUOTE\n%i\n\n -- %:link %u\n #+END_QUOTE\n\n%?")
+			      ("L" "Protocol Link" entry
+			       (file+headline "~/gtd/refile.org" "Notes")
+			       "* %? [[%:link][%:description]] \nCaptured On: %u")
+			      ("@" "Inbox [mu4e]" entry (file "inbox.org")
+			       ,(concat "* TODO Process \"%a\" %?\n"
+					"/Entered on/ %U"))
+			      ("m" "Meeting" entry
+			       (file+headline "~/gtd/agenda.org" "Future")
+			       ,(concat "* %? :meeting:\n"
+					"<%<%Y-%m-%d %a %H:00>>")
+			       ("n" "Note" entry
+				(file "~/gtd/notes.org")
+				,(concat "* Note (%a)\n"
+					 "/Entered on/ %U\n" "\n" "%?")))))
 
 (setq org-agenda-window-setup (quote current-window))
+
+(setq org-agenda-hide-tags-regexp ".")
+
+(setq org-agenda-custom-commands
+      '(("g" "Get Things Done (GTD)"
+	 ((agenda ""
+		  ((org-agenda-skip-function
+		    '(org-agenda-skip-entry-if 'deadline))
+		   (org-deadline-warning-days 0)))
+	  (todo "NEXT"
+		  ((org-agenda-skip-function
+		    '(org-agenda-skip-entry-if 'deadline))
+		   (org-agenda-prefix-format "  %i %-12:c [%e] ")
+		   (org-agenda-overriding-header "\nTasks\n")))
+	  (agenda nil
+		  ((org-agenda-entry-types '(:deadline))
+		   (org-agenda-format-date "")
+		   (org-deadline-warning-days 7)
+		   (org-agenda-skip-function
+		    '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
+		   (org-agenda-overriding-header "\nDeadlines")))
+	 (tags-todo "inbox"
+		    ((org-agenda-prefix-format "  %?-12t% s")
+		     (org-agenda-overriding-header "\nInbox\n")))
+	 (tags "CLOSED>=\"<today\""
+	       ((org-agenda-overriding-header "\nCompleted today\n")))))))
+
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12:c%?-12t% s")
+	(todo   . " ")
+	(tags   . " %i %-12:c")
+	(tags   . " %i %-12:c")))
 
 (setq org-deadline-warning-days 7)
 
@@ -148,12 +218,24 @@
 	(tags priority-down category-keep)
 	(search category-keep))))
 
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps nil)
+
 (setq org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
 			   ("~/gtd/someday.org" :level . 1)
-			   ("~/gtd/tickler.org" :maxlevel . 2)))
+			   ("~/gtd/tickler.org" :maxlevel . 2)
+			   ("~/gtd/projects.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")))
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "PROJ(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
+(defun log-todo-next-creation-date (&rest ignore)
+  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+  (when (and (string= (org-get-todo-state) "NEXT")
+	     (not (org-entry-get nil "ACTIVATED")))
+    (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
+
+(add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
 
 (setq org-goto-auto-isearch nil)
 
@@ -167,6 +249,10 @@
 (setq org-list-description-max-indent 5)
 
 (setq org-adapt-indentation nil)
+
+(use-package ob-http
+  :defer t
+  :ensure org-contrib)
 
 (use-package ob-python
   :defer t
@@ -211,9 +297,106 @@
   (org-babel-execute:gnuplot
    org-babel-expand-body:gnuplot))
 
+(require 'mu4e)
+  (require 'org-mu4e)
+  (require 'mu4e-contrib)
+  (require 'smtpmail)
+
+  (auth-source-pass-enable)
+  (setq auth-source-debug t)
+  (setq auth-source-do-cache nil)
+  (setq auth-sources '(password-store))
+  (setq message-kill-buffer-on-exit t)
+  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq mu4e-attachment-dir "~/Downloads")
+  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-completing-read-function 'completing-read)
+  (setq mu4e-compose-complete-addresses t)
+  (setq mu4e-compose-context-policy nil)
+  (setq mu4e-compose-dont-reply-to-self t)
+  (setq mu4e-compose-keep-self-cc nil)
+  (setq mu4e-context-policy 'pick-first)
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-headers-date-format "%d-%m-%Y %H:%M")
+  (setq mu4e-headers-fields '((:human-date . 20)
+			      (:flags . 6)
+			      (:mailing-list . 10)
+			      (:from . 22)
+			      (:subject)))
+  (setq mu4e-headers-include-related t)
+  (setq mu4e-sent-messages-behavior 'delete)
+  (setq mu4e-view-show-addresses t)
+  (setq mu4e-view-show-images t)
+  (setq smtpmail-debug-info t)
+  (setq smtpmail-stream-type 'starttls)
+  (setq mm-sign-option 'guided)
+
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+
+  (defun sign-or-encrypt-message ()
+    (let ((answer (read-from-minibuffer "Sign or encrypt?\nEmpty to do nothing.\n[s/e]: ")))
+      (cond
+       ((string-equal answer "s") (progn
+				    (message "Signing message.")
+				    (mml-secure-message-sign-pgpmime)))
+       ((string-equal answer "e") (progn
+				    (message "Encrypt and signing message.")
+				    (mml-secure-message-encrypt-pgpmime)))
+       (t (progn
+	    (message "Dont signing or encrypting message.")
+	    nil)))))
+
+  (add-hook 'message-send-hook 'sign-or-encrypt-message)
+
+  (setq mu4e-contexts
+	`( ,(make-mu4e-context
+	     :name "gmail"
+	     :enter-func (lambda ()
+			   (mu4e-message "Entering gmail context")
+			   (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			     (revert-buffer)))
+	     :leave-func (lambda ()
+			   (mu4e-message "Leaving gmail context")
+			   (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			     (revert-buffer)))
+	     :match-func (lambda (msg)
+			   (when msg
+			     (or (mu4e-message-contact-field-matches msg :to "dan@missingbracket.dev")
+				 (mu4e-message-contact-field-matches msg :from "dan@missingbracket.dev")
+				 (mu4e-message-contact-field-matches msg :cc "dan@missingbracket.dev")
+				 (mu4e-message-contact-field-matches msg :bcc "dan@missingbracket.dev")
+				 (string-match-p "^/gmail/Inbox" (mu4e-message-field msg :maildir)))))
+	     :vars '( ( user-mail-address            . "dan@missingbracket.dev" )
+		      ( smtpmail-smtp-user           . "dan@missingbracket.dev" )
+		      ( mu4e-compose-signature       . "Daniel Xu" )
+		      ( smtpmail-smtp-server         . "smtp.gmail.com" )
+		      ( smtpmail-smtp-service        . 587 )
+		      ( mu4e-maildir-shortcuts       . ((:maildir "/gmail/Inbox" :key ?i)))
+		      ( mu4e-bookmarks
+			.
+			(( :name  "Unread messages"
+				   :query "maildir:/gmail/Inbox AND flag:unread AND NOT flag:trashed AND NOT outdoorexperten"
+				   :key ?u)
+			  ( :name "Today's messages"
+				  :query "maildir:/gmail/Inbox AND date:today..now"
+				  :key ?t)
+			  ( :name "Last 7 days"
+				  :query "maildir:/gmail/Inbox AND date:7d..now"
+				  :hide-unread t
+				  :key ?w)
+			  ( :name "Deleted"
+				  :query "flag:trashed"
+				  :key ?d)
+			  ( :name "Possibly garbage"
+				  :query "bokio OR outdoorexperten"
+				  :key ?g)))))
+
+))
+
 (defun proced-settings ()
   "Function for setting proced settings."
-  (proced-toggle-auto-update))
+  (proced-toggle-auto-update 5))
 
 (add-hook 'proced-mode-hook 'proced-settings)
 
@@ -329,6 +512,17 @@
 (use-package flycheck
   :init (global-flycheck-mode))
 
+(use-package git-gutter
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (setq git-gutter:update-interval 0.02))
+
+(use-package git-gutter-fringe
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+
 (use-package hydra
  :config
  (defhydra hydra-zoom (global-map "<f2>")
@@ -413,13 +607,36 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
+
+
+(setq org-directory (concat (getenv "HOME") "/Documents/notes/"))
+
+(use-package org-roam
+  :after org
+  :init (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
+  :custom
+  (org-roam-directory (file-truename org-directory))
+  :config
+  (org-roam-setup)
+  :bind (("C-c n f" . org-roam-node-find)
+	 ("C-c n r" . org-roam-node-random)
+	 (:map org-mode-map
+	       (("C-c n i" . org-roam-node-insert)
+		("C-c n o" . org-id-get-create)
+		("C-c n t" . org-roam-tag-add)
+		("C-c n a" . org-roam-alias-add)
+		("C-c n l" . org-roam-buffer-toggle)))))
+
 (use-package paredit
   :ensure t
-  :hook ((emacs-lisp-mode-hook . paredit-mode)
-	 (lisp-interaction-mode-hook . paredit-mode)
+  :hook ((clojure-mode-hook . paredit-mode)
+	 (cider-repl-mode-hook . paredit-mode)
+	 (emacs-lisp-mode-hook . paredit-mode)
+	 (eval-expression-minibuffer-setup-hook . paredit-mode)
 	 (ielm-mode-hook . paredit-mode)
+	 (lisp-interaction-mode-hook . paredit-mode)
 	 (lisp-mode-hook . paredit-mode)
-	 (eval-expression-minibuffer-setup-hook . paredit-mode))
+	 (scheme-mode-hook . paredit-mode))
   :bind (("C-M-u" . paredit-backward-up)
 	 ("C-M-n" . paredit-forward-up)
 	 ("M-S" . paredit-splice-sexp-killing-backward)
@@ -428,7 +645,8 @@
 	 ("M-[" . paredit-wrap-square)
 	 ("M-{" . paredit-wrap-curly))
   :config
-  (diminish 'paredit-mode "()"))
+  (show-paren-mode t)
+  :diminish nil)
 
 (use-package projectile
   :ensure t
@@ -480,23 +698,21 @@
 		  file (projectile-project-root)))
       (run-hooks 'projectile-find-file-hook)
       (cider-jack-in)))
+
+    (add-to-list 'projectile-globally-ignored-directories "node_modules")
   )
 
 (use-package python-mode
   :custom
-  (py-shell-name "ipython")
   (py-force-py-shell-name-p t)
-  (py-switch-buffers-on-execute-p t)
+  (py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
+  (py-shell-name "ipython")
+  (py-shell-switch-buffers-on-execute-p t)
   (py-smart-indentation t)
   (py-split-windows-on-execute-p nil)
-  (py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
-  (py-smart-indentation t)
+  (py-switch-buffers-on-execute-p t)
   :config
   (setq-default py-which-bufname "IPython"))
-
-
-
- ;;
 
 (use-package rainbow-mode
  :ensure t
@@ -626,6 +842,8 @@ minibuffer-local-completion-map))
 
 (setq prettify-symbols-unprettify-at-point 'right-edge)
 
+(setq default-frame-alist '((font . "Iosevka 16")))
+
 (unless (package-installed-p 'moe-theme)
   (package-refresh-contents)
   (package-install 'moe-theme))
@@ -706,7 +924,20 @@ minibuffer-local-completion-map))
   (setq sbt:program-options '("-Dsbt.supershell=false"))
   )
 
-(defvar my-term-shell "/bin/bash")
-(defadvice ansi-term (before force-bash)
-  (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
+(setq explicit-shell-file-name (executable-find "zsh"))
+
+(defun kill-term-exec-hook ()
+  "hook to kill buffer automatically after closing ans-iterm"
+  (let* ((buff (current-buffer))
+	 (proc (get-buffer-process buff)))
+       (set-process-sentinel
+	proc
+	`(lambda (process event)
+	   (if (string= event "finished\n")
+	       (kill-buffer ,buff))))))
+
+
+(add-hook 'term-exec-hook 'kill-term-exec-hook)
+
+(eval-after-load "term"
+  '(define-key term-raw-map (kbd "C-c C-y") 'term-paste))

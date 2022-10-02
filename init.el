@@ -45,7 +45,7 @@
  '(lsp-rust-analyzer-cargo-watch-command "clippy" t)
  '(lsp-rust-analyzer-server-display-inlay-hints t t)
  '(package-selected-packages
-   '(crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
+   '(emacsql-sqlite crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
  '(py-force-py-shell-name-p t)
  '(py-python-command "ipython")
  '(py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
