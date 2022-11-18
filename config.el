@@ -37,15 +37,49 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (add-to-list 'exec-path "/usr/local/bin")
-(add-to-list 'exec-path
-	     (concat (file-name-as-directory (getenv "HOME")) ".local/bin"))
+
+(defun home-prefix (home-dir)
+  "prepend location of 'HOME-DIR' to a file path."
+  (concat (file-name-as-directory (getenv "HOME")) home-dir))
+
+(setq home-paths
+      '(".local/bin" ".cargo/bin" ".local/share/gem/ruby/3.0.0/bin" ".cargo/bin" ".cabal/bin"))
+
+(mapc (lambda (home-path) (add-to-list 'exec-path (home-prefix home-path)))
+      home-paths)
 
 (setq tramp-default-method "ssh")
 
 (setq register-separator ?+)
 (set-register register-separator "\n\n")
 
+(global-whitespace-mode)
+(setq whitespace-style '(face tabs tab-mark trailing))
+(custom-set-faces
+ '(whitespace-tab ((t (:foreground "#636363")))))
+
+(setq whitespace-display-mappings
+      '((tab-mark 9 [124 9] [92 9])))
+
 (prefer-coding-system 'utf-8)
+
+(require 'display-line-numbers)
+
+(defcustom display-line-numbers-exempt-modes
+  '(vterm-mode eshell-mode shell-mode shell-mode term-mode ansi-term-mode help-mode paradox-mode comint-mode)
+  "Major modes on which to disable line numbers."
+  :group 'display-line-numbers
+  :type 'list
+  :version "green")
+
+(defun display-line-numbers--turn-on ()
+  "Turn on line numbers except for certain major modes.
+Exempt modes are defined in `display-line-numbers-exempt-modes'."
+  (unless (or (minibufferp)
+	      (member major-mode display-line-numbers-exempt-modes))
+    (display-line-numbers-mode)))
+
+(global-display-line-numbers-mode 1)
 
 (setq display-line-numbers 'relative)
 
@@ -298,101 +332,130 @@ See also `org-save-all-org-buffers'"
    org-babel-expand-body:gnuplot))
 
 (require 'mu4e)
-  (require 'org-mu4e)
-  (require 'mu4e-contrib)
-  (require 'smtpmail)
+(require 'org-mu4e)
+(require 'mu4e-contrib)
+(require 'smtpmail)
 
-  (auth-source-pass-enable)
-  (setq auth-source-debug t)
-  (setq auth-source-do-cache nil)
-  (setq auth-sources '(password-store))
-  (setq message-kill-buffer-on-exit t)
-  (setq message-send-mail-function 'smtpmail-send-it)
-  (setq mu4e-attachment-dir "~/Downloads")
-  (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-completing-read-function 'completing-read)
-  (setq mu4e-compose-complete-addresses t)
-  (setq mu4e-compose-context-policy nil)
-  (setq mu4e-compose-dont-reply-to-self t)
-  (setq mu4e-compose-keep-self-cc nil)
-  (setq mu4e-context-policy 'pick-first)
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-headers-date-format "%d-%m-%Y %H:%M")
-  (setq mu4e-headers-fields '((:human-date . 20)
-			      (:flags . 6)
-			      (:mailing-list . 10)
-			      (:from . 22)
-			      (:subject)))
-  (setq mu4e-headers-include-related t)
-  (setq mu4e-sent-messages-behavior 'delete)
-  (setq mu4e-view-show-addresses t)
-  (setq mu4e-view-show-images t)
-  (setq smtpmail-debug-info t)
-  (setq smtpmail-stream-type 'starttls)
-  (setq mm-sign-option 'guided)
+(auth-source-pass-enable)
+(setq auth-source-debug t)
+(setq auth-source-do-cache nil)
+(setq auth-sources '(password-store))
+(setq message-kill-buffer-on-exit t)
+(setq message-send-mail-function 'smtpmail-send-it)
+(setq mu4e-attachment-dir "~/Downloads")
+(setq mu4e-change-filenames-when-moving t)
+(setq mu4e-completing-read-function 'completing-read)
+(setq mu4e-compose-complete-addresses t)
+(setq mu4e-compose-context-policy nil)
+(setq mu4e-compose-dont-reply-to-self t)
+(setq mu4e-compose-keep-self-cc nil)
+(setq mu4e-context-policy 'pick-first)
+(setq mu4e-get-mail-command "mbsync -a")
+(setq mu4e-headers-date-format "%d-%m-%Y %H:%M")
+(setq mu4e-headers-fields '((:human-date . 20)
+			    (:flags . 6)
+			    (:mailing-list . 10)
+			    (:from . 22)
+			    (:subject)))
+(setq mu4e-headers-include-related t)
+(setq mu4e-sent-messages-behavior 'delete)
+(setq mu4e-view-show-addresses t)
+(setq mu4e-view-show-images t)
+(setq smtpmail-debug-info t)
+(setq smtpmail-stream-type 'starttls)
+(setq mm-sign-option 'guided)
 
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
 
-  (defun sign-or-encrypt-message ()
-    (let ((answer (read-from-minibuffer "Sign or encrypt?\nEmpty to do nothing.\n[s/e]: ")))
-      (cond
-       ((string-equal answer "s") (progn
-				    (message "Signing message.")
-				    (mml-secure-message-sign-pgpmime)))
-       ((string-equal answer "e") (progn
-				    (message "Encrypt and signing message.")
-				    (mml-secure-message-encrypt-pgpmime)))
-       (t (progn
-	    (message "Dont signing or encrypting message.")
-	    nil)))))
+(defun sign-or-encrypt-message ()
+  (let ((answer (read-from-minibuffer "Sign or encrypt?\nEmpty to do nothing.\n[s/e]: ")))
+    (cond
+     ((string-equal answer "s") (progn
+				  (message "Signing message.")
+				  (mml-secure-message-sign-pgpmime)))
+     ((string-equal answer "e") (progn
+				  (message "Encrypt and signing message.")
+				  (mml-secure-message-encrypt-pgpmime)))
+     (t (progn
+	  (message "Dont signing or encrypting message.")
+	  nil)))))
 
-  (add-hook 'message-send-hook 'sign-or-encrypt-message)
+(add-hook 'message-send-hook 'sign-or-encrypt-message)
 
-  (setq mu4e-contexts
-	`( ,(make-mu4e-context
-	     :name "gmail"
-	     :enter-func (lambda ()
-			   (mu4e-message "Entering gmail context")
-			   (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
-			     (revert-buffer)))
-	     :leave-func (lambda ()
-			   (mu4e-message "Leaving gmail context")
-			   (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
-			     (revert-buffer)))
-	     :match-func (lambda (msg)
-			   (when msg
-			     (or (mu4e-message-contact-field-matches msg :to "dan@missingbracket.dev")
-				 (mu4e-message-contact-field-matches msg :from "dan@missingbracket.dev")
-				 (mu4e-message-contact-field-matches msg :cc "dan@missingbracket.dev")
-				 (mu4e-message-contact-field-matches msg :bcc "dan@missingbracket.dev")
-				 (string-match-p "^/gmail/Inbox" (mu4e-message-field msg :maildir)))))
-	     :vars '( ( user-mail-address            . "dan@missingbracket.dev" )
-		      ( smtpmail-smtp-user           . "dan@missingbracket.dev" )
-		      ( mu4e-compose-signature       . "Daniel Xu" )
-		      ( smtpmail-smtp-server         . "smtp.gmail.com" )
-		      ( smtpmail-smtp-service        . 587 )
-		      ( mu4e-maildir-shortcuts       . ((:maildir "/gmail/Inbox" :key ?i)))
-		      ( mu4e-bookmarks
-			.
-			(( :name  "Unread messages"
-				   :query "maildir:/gmail/Inbox AND flag:unread AND NOT flag:trashed AND NOT outdoorexperten"
-				   :key ?u)
-			  ( :name "Today's messages"
-				  :query "maildir:/gmail/Inbox AND date:today..now"
-				  :key ?t)
-			  ( :name "Last 7 days"
-				  :query "maildir:/gmail/Inbox AND date:7d..now"
-				  :hide-unread t
-				  :key ?w)
-			  ( :name "Deleted"
-				  :query "flag:trashed"
-				  :key ?d)
-			  ( :name "Possibly garbage"
-				  :query "bokio OR outdoorexperten"
-				  :key ?g)))))
+(setq mu4e-contexts
+      `( ,(make-mu4e-context
+	   :name "gmail"
+	   :enter-func (lambda ()
+			 (mu4e-message "Entering gmail context")
+			 (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			   (revert-buffer)))
+	   :leave-func (lambda ()
+			 (mu4e-message "Leaving gmail context")
+			 (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			   (revert-buffer)))
+	   :match-func (lambda (msg)
+			 (when msg
+			   (or (mu4e-message-contact-field-matches msg :to "dan@missingbracket.dev")
+			       (mu4e-message-contact-field-matches msg :from "dan@missingbracket.dev")
+			       (mu4e-message-contact-field-matches msg :cc "dan@missingbracket.dev")
+			       (mu4e-message-contact-field-matches msg :bcc "dan@missingbracket.dev")
+			       (string-match-p "^/gmail/Inbox" (mu4e-message-field msg :maildir)))))
+	   :vars '( ( user-mail-address            . "dan@missingbracket.dev" )
+		    ( smtpmail-smtp-user           . "dan@missingbracket.dev" )
+		    ( mu4e-compose-signature       . "Daniel Xu" )
+		    ( smtpmail-smtp-server         . "smtp.gmail.com" )
+		    ( smtpmail-smtp-service        . 587 )
+		    ( mu4e-maildir-shortcuts       . ((:maildir "/gmail/Inbox" :key ?i)))
+		    ( mu4e-bookmarks
+		      .
+		      (( :name  "Unread messages"
+				 :query "maildir:/gmail/Inbox AND flag:unread AND NOT flag:trashed AND NOT outdoorexperten"
+				 :key ?u)
+			( :name "Today's messages"
+				:query "maildir:/gmail/Inbox AND date:today..now"
+				:key ?t)
+			( :name "Last 7 days"
+				:query "maildir:/gmail/Inbox AND date:7d..now"
+				:hide-unread t
+				:key ?w)
+			( :name "Deleted"
+				:query "flag:trashed"
+				:key ?d)
+			( :name "Possibly garbage"
+				:query "bokio OR outdoorexperten"
+				:key ?g)))))
+	 ,(make-mu4e-context
+	   :name "personal"
+	   :enter-func (lambda ()
+			 (mu4e-message "Entering personal context")
+			 (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			   (revert-buffer)))
+	   :leave-func (lambda ()
+			 (mu4e-message "Leaving personal context")
+			 (when (string-match-p (buffer-name (current-buffer)) "mu4e-main")
+			   (revert-buffer)))
+	   :match-func (lambda (msg)
+			 (when msg
+			   (or (mu4e-message-contact-field-matches msg :to "dxu@coldfix.dev")
+			       (mu4e-message-contact-field-matches msg :from "dxu@coldfix.dev")
+			       (mu4e-message-contact-field-matches msg :cc "dxu@coldfix.dev")
+			       (mu4e-message-contact-field-matches msg :bcc "dxu@coldfix.dev"))))
 
-))
+	   :vars '( ( user-mail-address       . "dxu@coldfix.dev" )
+		    ( smtpmail-smtp-user      . "dxu@coldfix.dev" )
+		    ( smtpmail-smtp-server    . "mail.coldfix.dev" )
+		    ( smtpmail-smtp-service   . 587 )
+		    ( mu4e-compose-signature  . "Daniel Xu" )
+		    ( mu4e-maildir-shortcuts  . ((:maildir "/coldfix/Inbox" :key ?i)))
+		    ( mu4e-bookmarks
+		      .
+		      (( :name  "All personal mails"
+				 :query "maildir:/coldfix/Inbox"
+				 :key ?a)
+		       ( :name  "Unread personal messages"
+				 :query "maildir:/coldfix/Inbox AND flag:unread AND NOT flag:trashed"
+				 :key ?u)))))))
 
 (defun proced-settings ()
   "Function for setting proced settings."
@@ -424,11 +487,12 @@ See also `org-save-all-org-buffers'"
 (use-package company
   :ensure t
   :hook (scala-mode . company-mode)
-  :config
-  (setq lsp-company-provider :capf)
-  (setq company-idle-delay 0.5)
-  (setq company-show-numbers t)
-  (setq company-minimum-prefix-length 3)
+  :custom
+  (lsp-company-provider :capf)
+  (company-idle-delay 0.5)
+  (company-show-numbers t)
+  (company-minimum-prefix-length 3)
+  (company-tooltip-align-annotations t)
   :bind (:map company-active-map
 	      ("M-n" . nil)
 	      ("M-p" . nil)
@@ -616,12 +680,14 @@ See also `org-save-all-org-buffers'"
   :init (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
   :custom
   (org-roam-directory (file-truename org-directory))
+  (org-roam-completion-everywhere t)
   :config
   (org-roam-setup)
   :bind (("C-c n f" . org-roam-node-find)
 	 ("C-c n r" . org-roam-node-random)
 	 (:map org-mode-map
-	       (("C-c n i" . org-roam-node-insert)
+	       (("C-M-i"   . completion-at-point)
+		("C-c n i" . org-roam-node-insert)
 		("C-c n o" . org-id-get-create)
 		("C-c n t" . org-roam-tag-add)
 		("C-c n a" . org-roam-alias-add)
@@ -650,7 +716,7 @@ See also `org-save-all-org-buffers'"
 
 (use-package projectile
   :ensure t
-  :after (magit cider)
+  :after (magit ivy cider)
   :init
   (projectile-mode +1)
   :bind-keymap ("C-c p" . projectile-command-map)
@@ -686,11 +752,11 @@ See also `org-save-all-org-buffers'"
   (def-projectile-commander-method ?j
     "Jack-in."
     (let* ((opts (projectile-current-project-files))
-	   (file (ido-completing-read
+	   (file (ivy-completing-read
 		  "Find file: "
 		  opts
 		  nil nil nil nil
-		  (car (cl-member-if
+		  (car (member-if
 			(lambda (f)
 			  (string-match "core\\.clj\\'" f))
 			opts)))))
@@ -700,6 +766,7 @@ See also `org-save-all-org-buffers'"
       (cider-jack-in)))
 
     (add-to-list 'projectile-globally-ignored-directories "node_modules")
+    (add-to-list 'projectile-globally-ignored-files "build")
   )
 
 (use-package python-mode
@@ -713,6 +780,8 @@ See also `org-save-all-org-buffers'"
   (py-switch-buffers-on-execute-p t)
   :config
   (setq-default py-which-bufname "IPython"))
+
+(setq py-pdb-path "/usr/lib/python3.10/pdb.py")
 
 (use-package rainbow-mode
  :ensure t
@@ -744,6 +813,22 @@ minibuffer-local-completion-map))
   :bind
   ([remap other-window] . switch-window))
 
+(use-package tide
+  :ensure t
+  :after (company flycheck)
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+  :hook ((before-save-hook . tide-format-before-save)
+	 (typescript-mode . setup-tide-mode))
+  )
+
 (use-package paradox
   :config
   (paradox-enable)
@@ -764,6 +849,16 @@ minibuffer-local-completion-map))
   :ensure t
   :init
   (which-key-mode))
+
+(use-package web-mode
+  :after (flycheck tide)
+  :hook
+  (web-mode-hook . (lambda ()
+		     (when (string-equal "tsx" (file-name-extension buffer-file-name))
+		       (setup-tide-mode))))
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package yasnippet
   :ensure t
@@ -853,10 +948,12 @@ minibuffer-local-completion-map))
 
 (setq-default c-basic-offset 4)
 
+(setq-default css-indent-offset 2)
+
 (use-package cider)
 
 ;; (global-set-key (kbd "C-c e l") #'find-library)
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq inferior-lisp-program (executable-find "sbcl"))
 
 (setq library-lisp-implementations '((sbcl ("sbcl")))
       slime-default-lisp 'sbcl
@@ -879,6 +976,11 @@ minibuffer-local-completion-map))
   :demand
   :config
   (slime-setup '(slime-fancy slime-company slime-cl-indent)))
+
+(use-package haskell-mode
+  :custom
+  (haskell-stylish-on-save t)
+  :hook (haskell-mode . turn-on-haskell-unicode-input-method))
 
 (add-to-list 'file-name-handler-alist '("\\.class$" . javap-handler))
 
@@ -908,6 +1010,24 @@ minibuffer-local-completion-map))
 		    inhibit-file-name-handlers)))
 	(inhibit-file-name-operation operation))
     (apply operation args)))
+
+(use-package js2-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  :hook
+  (js2-mode . js2-imenu-extras-mode))
+
+(use-package xref-js2)
+
+(use-package js2-refactor
+  :after js2-mode
+  :bind (:map js2-mode-map
+		("M-." . nil)
+		("C-k" . js2r-kill))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  :hook (js2-mode-hook . (lambda () (add-hook 'xref-backend-functions #'xref-js2-backend nil t)))
+  )
 
 (use-package scala-mode
   :mode "\\.\\(sc\\|scala\\)|\\'"

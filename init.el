@@ -31,11 +31,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
- '(ivy-count-format "%d/%d " t)
- '(ivy-height 10 t)
- '(ivy-initial-inputs-alist nil t)
+ '(company-show-quick-access t nil nil "Customized with use-package company")
+ '(ivy-count-format "%d/%d ")
+ '(ivy-height 10)
+ '(ivy-initial-inputs-alist nil)
  '(ivy-rebuilders-alist '((t . ivy--regex-ignore-order)) t)
- '(ivy-use-virtual-buffers t t)
+ '(ivy-use-virtual-buffers t)
  '(jdee-jdk-registry
    '(("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
      ("1.8.0_192" . "/usr/lib64/jvm/java-11-openjdk")))
@@ -45,7 +46,7 @@
  '(lsp-rust-analyzer-cargo-watch-command "clippy" t)
  '(lsp-rust-analyzer-server-display-inlay-hints t t)
  '(package-selected-packages
-   '(emacsql-sqlite crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
+   '(haskell-mode js2-refactor xref-js2 js2-mode emacsql-sqlite crystal-mode lsp-metals counsel benchmark-init paradox posframe dap-mode paren-face slime-company slime scala-mode org python-mode flycheck arduino-mode hydra company company-irony company-jedi ivy swiper yasnippet-snippets yasnippet magit htmlize 4clojure helm geiser spaceline cider emacsql smartparens fill-column-indicator gradle-mode rtags beacon jdee fsharp-mode which-key use-package moe-theme ein))
  '(py-force-py-shell-name-p t)
  '(py-python-command "ipython")
  '(py-python-command-args '("--gui=wx" "--pylab=wx" "-colors"))
@@ -60,4 +61,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(whitespace-tab ((t (:foreground "#636363")))))
