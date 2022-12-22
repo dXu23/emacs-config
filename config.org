@@ -482,7 +482,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 ** Mu4e
 #+begin_src emacs-lisp
   (require 'mu4e)
-  (require 'org-mu4e)
+  (require 'mu4e-org)
   (require 'mu4e-contrib)
   (require 'smtpmail)
 

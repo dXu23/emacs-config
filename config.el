@@ -332,7 +332,7 @@ See also `org-save-all-org-buffers'"
    org-babel-expand-body:gnuplot))
 
 (require 'mu4e)
-(require 'org-mu4e)
+(require 'mu4e-org)
 (require 'mu4e-contrib)
 (require 'smtpmail)
 

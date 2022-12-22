@@ -16,7 +16,6 @@
 			   (or load-path nil))))
 
   ;; load up Org-mode and Org-babel
-  (require 'org-install)
   (require 'ob-tangle))
 
 (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
@@ -41,8 +40,8 @@
    '(("11.0.1" . "/usr/lib/jvm/java-11-openjdk")
      ("1.8.0_192" . "/usr/lib64/jvm/java-11-openjdk")))
  '(jdee-server-dir "~/jdee-server/target/")
- '(lsp-eldoc-render-all t t)
- '(lsp-idle-delay 0.6 t)
+ '(lsp-eldoc-render-all t)
+ '(lsp-idle-delay 0.6)
  '(lsp-rust-analyzer-cargo-watch-command "clippy" t)
  '(lsp-rust-analyzer-server-display-inlay-hints t t)
  '(package-selected-packages
