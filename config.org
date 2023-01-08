@@ -47,6 +47,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 #+BEGIN_SRC elisp
 (setq make-backup-file nil)
 #+END_SRC
+** Set repeat-mode
+#+begin_src emacs-lisp
+  (repeat-mode 1)
+#+end_src
 ** Get rid of lock mode.
 #+BEGIN_SRC emacs-lisp
   (setq create-lockfiles nil)
@@ -776,38 +780,7 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
     (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 #+end_src
-** Hydra
-#+BEGIN_SRC emacs-lisp
-  (use-package hydra
-   :config
-   (defhydra hydra-zoom (global-map "<f2>")
-     "zoom"
-     ("g" text-scale-increase "in")
-     ("l" text-scale-decrease "out")))
 
-  (global-set-key
-   (kbd "C-n")
-   (defhydra hydra-move
-     (:body-pre (next-line))
-     "move"
-     ("n" next-line)
-     ("p" previous-line)
-     ("f" forward-char)
-     ("F" forward-word)
-     ("b" backward-char)
-     ("B" backward-word)
-     ("a" move-beginning-of-line)
-     ("A" backward-sentence)
-     ("e" move-end-of-line)
-     ("E" forward-sentence)
-     ("v" scroll-up-command)
-     ("V" scroll-down-command)
-     ("l" recenter-top-bottom)
-     (">" end-of-buffer)
-     ("<" beginning-of-buffer))
-   )
-
-#+END_SRC
 ** Ivy
 #+BEGIN_SRC emacs-lisp
     (use-package ivy
