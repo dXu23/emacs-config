@@ -225,6 +225,17 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 
 #+END_SRC
 
+*** org-timer
+#+begin_src emacs-lisp
+  (use-package org-alert
+    :ensure t
+    :custom (alert-default-style 'notifications)
+    :config
+    (setq org-alert-interval 300
+	  org-alert-notification-title "Org Alert Reminder!")
+    (org-alert-enable))
+#+end_src
+
 *** Save corresponding buffers
 #+begin_src emacs-lisp
   (defun gtd-save-org-buffers ()
@@ -483,6 +494,16 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 	(org-babel-execute:gnuplot
 	 org-babel-expand-body:gnuplot))
 #+end_src
+**** plantuml
+#+begin_src emacs-lisp
+  (use-package ob-plantuml
+    :defer t
+    :ensure org-contrib
+    :commands
+    (org-babel-execute:plantuml
+     org-babel-expand-body:plantuml))
+#+end_src
+
 ** Mu4e
 #+begin_src emacs-lisp
   (require 'mu4e)
@@ -898,6 +919,10 @@ Credit goes to Uncle Dave on Youtube for helping me set up my emacs config
 	   (scheme-mode-hook . paredit-mode))
     :bind (("C-M-u" . paredit-backward-up)
 	   ("C-M-n" . paredit-forward-up)
+	   ("C-)" . paredit-forward-slurp-sexp)
+	   ("C-}" . paredit-forward-barf-sexp)
+	   ("C-(" . paredit-backward-slurp-sexp)
+	   ("C-{" . paredit-backward-barf-sexp)
 	   ("M-S" . paredit-splice-sexp-killing-backward)
 	   ("M-R" . paredit-raise-sexp)
 	   ("M-(" . paredit-wrap-round)
@@ -1182,7 +1207,6 @@ minibuffer-local-completion-map))
 (setq prettify-symbols-unprettify-at-point 'right-edge)
 #+END_SRC
 
-#+END_SRC
 ** Set font
 #+begin_src emacs-lisp
   (setq default-frame-alist '((font . "Iosevka 16")))
@@ -1298,6 +1322,20 @@ minibuffer-local-completion-map))
     )
 
 #+end_src
+** Ruby
+*** Ruby Electric Mode
+#+begin_src emacs-lisp
+  (use-package ruby-electric
+    :hook
+    (ruby-mode . ruby-electric-mode))
+#+end_src
+*** inf-ruby
+#+begin_src emacs-lisp
+  (use-package inf-ruby
+    :commands inf-ruby-minor-mode
+    :hook
+    (ruby-mode . inf-ruby-minor-mode))
+#+end_src
 ** Scala
 #+begin_src emacs-lisp
   (use-package scala-mode
@@ -1315,6 +1353,7 @@ minibuffer-local-completion-map))
     (setq sbt:program-options '("-Dsbt.supershell=false"))
     )
 #+end_src
+
 * Terminal
 ** Setting default shell to bash
 #+BEGIN_SRC emacs-lisp

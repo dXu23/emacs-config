@@ -30,6 +30,8 @@
 
 (setq make-backup-file nil)
 
+(repeat-mode 1)
+
 (setq create-lockfiles nil)
 
 (setq auto-save-default nil)
@@ -153,6 +155,14 @@ Exempt modes are defined in `display-line-numbers-exempt-modes'."
 (setq org-agenda-files (mapcar
       (lambda (file) (concat (file-name-as-directory (expand-file-name "gtd" (getenv "HOME"))) file))
       '("inbox.org" "gtd.org" "tickler.org" "agenda.org")))
+
+(use-package org-alert
+  :ensure t
+  :custom (alert-default-style 'notifications)
+  :config
+  (setq org-alert-interval 300
+	org-alert-notification-title "Org Alert Reminder!")
+  (org-alert-enable))
 
 (defun gtd-save-org-buffers ()
   "Save `org-agenda-files' buffers without user confirmation.
@@ -587,35 +597,6 @@ See also `org-save-all-org-buffers'"
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
-(use-package hydra
- :config
- (defhydra hydra-zoom (global-map "<f2>")
-   "zoom"
-   ("g" text-scale-increase "in")
-   ("l" text-scale-decrease "out")))
-
-(global-set-key
- (kbd "C-n")
- (defhydra hydra-move
-   (:body-pre (next-line))
-   "move"
-   ("n" next-line)
-   ("p" previous-line)
-   ("f" forward-char)
-   ("F" forward-word)
-   ("b" backward-char)
-   ("B" backward-word)
-   ("a" move-beginning-of-line)
-   ("A" backward-sentence)
-   ("e" move-end-of-line)
-   ("E" forward-sentence)
-   ("v" scroll-up-command)
-   ("V" scroll-down-command)
-   ("l" recenter-top-bottom)
-   (">" end-of-buffer)
-   ("<" beginning-of-buffer))
- )
-
 (use-package ivy
     :ensure t
     :config
@@ -705,6 +686,10 @@ See also `org-save-all-org-buffers'"
 	 (scheme-mode-hook . paredit-mode))
   :bind (("C-M-u" . paredit-backward-up)
 	 ("C-M-n" . paredit-forward-up)
+	 ("C-)" . paredit-forward-slurp-sexp)
+	 ("C-}" . paredit-forward-barf-sexp)
+	 ("C-(" . paredit-backward-slurp-sexp)
+	 ("C-{" . paredit-backward-barf-sexp)
 	 ("M-S" . paredit-splice-sexp-killing-backward)
 	 ("M-R" . paredit-raise-sexp)
 	 ("M-(" . paredit-wrap-round)
@@ -1028,6 +1013,15 @@ minibuffer-local-completion-map))
   (js2r-add-keybindings-with-prefix "C-c C-r")
   :hook (js2-mode-hook . (lambda () (add-hook 'xref-backend-functions #'xref-js2-backend nil t)))
   )
+
+(use-package ruby-electric
+  :hook
+  (ruby-mode . ruby-electric-mode))
+
+(use-package inf-ruby
+  :commands inf-ruby-minor-mode
+  :hook
+  (ruby-mode . inf-ruby-minor-mode))
 
 (use-package scala-mode
   :mode "\\.\\(sc\\|scala\\)|\\'"
